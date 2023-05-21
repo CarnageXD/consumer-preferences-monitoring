@@ -9,6 +9,7 @@ export const button = {
         alignItems: "items-center",
         fontWeight: "font-medium",
         textTransform: "capitalize",
+        bg: "!bg-primary-blue",
       },
     },
     variants: {},

@@ -16,18 +16,11 @@ module.exports = withMT({
       serif: ["ui-serif"],
     },
     colors: {
-      "primary-white": "#fffffb",
       "primary-crimson": "#9b014a",
-      "primary-blue": "#22338f",
-      "primary-yellow": "#ffdd3e",
+      "primary-blue": "#041a72",
+      "primary-yellow": "#f8d000",
     },
-    extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-      },
-    },
+    extend: {},
   },
   plugins: [],
 });
