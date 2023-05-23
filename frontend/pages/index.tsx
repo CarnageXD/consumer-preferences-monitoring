@@ -17,7 +17,7 @@ export default function Products() {
           title="Про Нас"
         />
         <PreviewImage
-          href="/survey"
+          href="/surveys"
           imageSrc={SurveyPreviewImg}
           title="Пройти Опитування"
         />

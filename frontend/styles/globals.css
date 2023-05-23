@@ -21,3 +21,19 @@
   margin: 0;
   box-sizing: border-box;
 }
+
+input[type="checkbox"]:checked {
+  @apply !bg-primary-blue !border-primary-blue;
+}
+
+input[type="radio"]:checked {
+  @apply !bg-white !border-primary-blue;
+}
+
+input::before {
+  @apply !opacity-0;
+}
+
+span.absolute {
+  @apply pt-0 pl-3;
+}

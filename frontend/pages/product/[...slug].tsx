@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Layout } from "@components/common";
 import { Product } from "@types";
 import Image from "next/image";
-import { Button, Rating, Textarea, Typography } from "@material-tailwind/react";
+import { Button, Rating, Typography } from "@material-tailwind/react";
+import { Textarea } from "@components/common";
 
 export default function Product() {
   const [rate, setRate] = useState(4);
@@ -78,7 +79,7 @@ export default function Product() {
             <Typography className="text-xl font-medium">
               Залишити свій відгук про товар:
             </Typography>
-            <textarea className="my-2 transition-all border-gray-300 p-2 resize-none w-full min-h-[150px] border-2 hover:border-primary-blue focus:border-primary-blue rounded-xl" />
+            <Textarea />
             <div className="flex justify-end">
               <Button className="bg-primary-blue">Залишити відгук</Button>
             </div>

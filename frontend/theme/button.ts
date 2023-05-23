@@ -9,10 +9,21 @@ export const button = {
         alignItems: "items-center",
         fontWeight: "font-medium",
         textTransform: "capitalize",
-        bg: "!bg-primary-blue",
       },
     },
-    variants: {},
+    variants: {
+      filled: {
+        blue: {
+          bg: "!bg-primary-blue",
+        },
+      },
+      outlined: {
+        blue: {
+          border: "border-2 border-primary-blue",
+          text: "text-primary-blue",
+        },
+      },
+    },
     sizes: {
       sm: {
         fontSize: "text-sm",

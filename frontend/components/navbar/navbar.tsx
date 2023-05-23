@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Navbar as MTNavbar, IconButton } from "@material-tailwind/react";
-import { XMarkIcon, Bars3Icon } from "@heroicons/react/20/solid";
+import {
+  Navbar as MTNavbar,
+  IconButton,
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+} from "@material-tailwind/react";
+import {
+  XMarkIcon,
+  Bars3Icon,
+  UserCircleIcon,
+} from "@heroicons/react/20/solid";
 import Image from "next/image";
 import LogoImg from "@public/logo.png";
 import Link from "next/link";
@@ -32,6 +43,8 @@ export const Navbar = () => {
     return () => window.removeEventListener("resize", handleEffect);
   }, []);
 
+  const isAnalytic = true;
+
   return (
     <MTNavbar
       fullWidth
@@ -41,20 +54,35 @@ export const Navbar = () => {
         <Link href="/" className="w-14 h-14">
           <Image src={LogoImg} alt="logo" />
         </Link>
-        <div>
+        <div className="flex items-center gap-8">
           <ul className="hidden lg:flex gap-8 font-semibold">
-            {links.map(({ href, title }) => (
-              <Link
-                key={title}
-                className={`hover:text-primary-yellow transition-all ${
-                  href === pathname ? "text-primary-yellow" : "text-white"
-                }`}
-                href={href}
-              >
-                {title}
-              </Link>
-            ))}
+            {links.map(({ href, title }) => {
+              if (!isAnalytic && href === "/analytics") {
+                return null;
+              }
+
+              return (
+                <Link
+                  key={title}
+                  className={`hover:text-primary-yellow transition-all ${
+                    href === pathname ? "text-primary-yellow" : "text-white"
+                  }`}
+                  href={href}
+                >
+                  {title}
+                </Link>
+              );
+            })}
           </ul>
+          <Menu>
+            <MenuHandler>
+              <UserCircleIcon className="cursor-pointer h-8 w-8" />
+            </MenuHandler>
+            <MenuList>
+              <MenuItem>Редагувати профіль</MenuItem>
+              <MenuItem>Вийти</MenuItem>
+            </MenuList>
+          </Menu>
         </div>
         <IconButton
           color="yellow"
