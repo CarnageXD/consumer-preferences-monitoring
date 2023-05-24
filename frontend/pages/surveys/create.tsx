@@ -1,32 +1,65 @@
-import { Layout, PageHeader } from "@components/common";
+import { EditableInput, Layout, PageHeader } from "@components/common";
 import { CreateQuestion } from "@components/survey";
 import { PlusCircleIcon } from "@heroicons/react/20/solid";
-import { Button, Input, Typography } from "@material-tailwind/react";
-import React, { useRef, useState } from "react";
+import { Button, Typography } from "@material-tailwind/react";
+import React, { useState } from "react";
 
 export default function CreateSurvey() {
-  const [titleFocused, setTitleFocused] = useState(false);
   const [title, setTitle] = useState(
     "Нове опитування (натисніть, щоб змінити назву)"
   );
-  const [questions, setQuestions] = useState([]);
+  const [questions, setQuestions] = useState<
+    { title: string; variants: string[]; type: "checkbox" | "radio" | "text" }[]
+  >([]);
 
-  const titleInputRef = useRef(null);
+  console.log("questions", questions);
 
   const handleAddQuestion = () => {
-    setQuestions([
-      //@ts-ignore
-      ...questions,
-      //@ts-ignore
+    setQuestions((prevQuestions) => [
+      ...prevQuestions,
       {
-        title: `Питання ${questions.length + 1}`,
-        variants: [],
+        title: `Питання ${prevQuestions.length + 1}`,
+        variants: ["Варіант 1"],
         type: "text",
       },
     ]);
   };
 
-  const handleUpdateQuestion = () => {};
+  const handleRemoveQuestion = (index: number) => {
+    setQuestions((prevQuestions) => {
+      const updatedQuestions = [...prevQuestions];
+      updatedQuestions.splice(index, 1);
+      return updatedQuestions;
+    });
+  };
+
+  const handleUpdateQuestion = (question: any, index: number) => {
+    setQuestions((prevQuestions) => {
+      const updatedQuestions = [...prevQuestions];
+      updatedQuestions[index] = question;
+      return updatedQuestions;
+    });
+  };
+
+  const handleRemoveVariant = (questionIndex: number, variantIndex: number) => {
+    setQuestions((prevQuestions) => {
+      const updatedQuestions = JSON.parse(JSON.stringify(prevQuestions));
+      updatedQuestions[questionIndex].variants.splice(variantIndex, 1);
+      return updatedQuestions;
+    });
+  };
+
+  const handleUpdateVariantTitle = (
+    title: string,
+    questionIndex: number,
+    variantIndex: number
+  ) => {
+    setQuestions((prevQuestions) => {
+      const updatedQuestions = [...prevQuestions];
+      updatedQuestions[questionIndex].variants[variantIndex] = title;
+      return updatedQuestions;
+    });
+  };
 
   return (
     <Layout className="pb-24 mb-0">
@@ -39,34 +72,23 @@ export default function CreateSurvey() {
         </div>
         <div className="mt-12">
           <div className="mb-6">
-            {titleFocused ? (
-              <Input
-                ref={titleInputRef}
-                placeholder="Назва опитування..."
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                onBlur={() => setTitleFocused(false)}
-              />
-            ) : (
-              <Typography
-                className="font-medium italic text-2xl"
-                onClick={() => {
-                  setTitleFocused(true);
-                }}
-              >
-                {title}
-              </Typography>
-            )}
+            <EditableInput
+              textClassname="italic text-2xl"
+              value={title}
+              setValue={setTitle}
+            />
           </div>
 
           <div className="flex flex-col gap-8">
-            {questions.map((question) => (
+            {questions.map((question, index) => (
               <CreateQuestion
-                //@ts-ignore
-                key={question.title}
-                //@ts-ignore
-                {...question}
+                key={index}
+                question={question}
+                questionIndex={index}
                 setQuestion={handleUpdateQuestion}
+                removeQuestion={handleRemoveQuestion}
+                removeVariant={handleRemoveVariant}
+                handleUpdateVariantTitle={handleUpdateVariantTitle}
               />
             ))}
           </div>

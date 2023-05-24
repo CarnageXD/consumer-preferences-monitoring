@@ -10,11 +10,11 @@ export const input = {
         bg: "!bg-white disabled:!bg-gray-300",
         color: "text-black",
         padding: "!px-3 !pt-4 !pb-4",
-        border: "border border-2 disabled:!border !border-b-2",
+        border: "border border-2 !border-gray-300 disabled:!border !border-b-2",
         borderColor:
           "border-primary-blue placeholder-shown:border-primary-blue disabled:!border-primary-blue",
         rounded: "rounded-xl",
-        hover: "hover:border-primary-yellow",
+        hover: "hover:border-primary-blue",
         placeholder: "placeholder:text-gray-500",
         cursor: "disabled:cursor-not-allowed",
       },

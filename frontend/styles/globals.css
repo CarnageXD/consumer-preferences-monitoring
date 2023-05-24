@@ -34,6 +34,6 @@ input::before {
   @apply !opacity-0;
 }
 
-span.absolute {
+button[role="combobox"] span.absolute {
   @apply pt-0 pl-3;
 }
