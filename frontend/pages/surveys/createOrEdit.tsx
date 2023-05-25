@@ -3,16 +3,21 @@ import { CreateQuestion } from "@components/survey";
 import { PlusCircleIcon } from "@heroicons/react/20/solid";
 import { Button, Typography } from "@material-tailwind/react";
 import React, { useState } from "react";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
-export default function CreateSurvey() {
+interface QuestionType {
+  title: string;
+  variants: string[];
+  type: "checkbox" | "radio" | "text";
+}
+
+export default function CreateOrUpdateSurvey() {
+  const survey: QuestionType[] = [];
+
   const [title, setTitle] = useState(
     "Нове опитування (натисніть, щоб змінити назву)"
   );
-  const [questions, setQuestions] = useState<
-    { title: string; variants: string[]; type: "checkbox" | "radio" | "text" }[]
-  >([]);
-
-  console.log("questions", questions);
+  const [questions, setQuestions] = useState<QuestionType[]>(survey || []);
 
   const handleAddQuestion = () => {
     setQuestions((prevQuestions) => [
@@ -33,7 +38,7 @@ export default function CreateSurvey() {
     });
   };
 
-  const handleUpdateQuestion = (question: any, index: number) => {
+  const handleUpdateQuestion = (question: QuestionType, index: number) => {
     setQuestions((prevQuestions) => {
       const updatedQuestions = [...prevQuestions];
       updatedQuestions[index] = question;
@@ -61,6 +66,18 @@ export default function CreateSurvey() {
     });
   };
 
+  const handleDragEnd = (result) => {
+    if (!result.destination) {
+      return;
+    }
+
+    const updatedQuestions = Array.from(questions);
+    const [removedQuestion] = updatedQuestions.splice(result.source.index, 1);
+    updatedQuestions.splice(result.destination.index, 0, removedQuestion);
+
+    setQuestions(updatedQuestions);
+  };
+
   return (
     <Layout className="pb-24 mb-0">
       <div className="max-w-2xl">
@@ -79,19 +96,39 @@ export default function CreateSurvey() {
             />
           </div>
 
-          <div className="flex flex-col gap-8">
-            {questions.map((question, index) => (
-              <CreateQuestion
-                key={index}
-                question={question}
-                questionIndex={index}
-                setQuestion={handleUpdateQuestion}
-                removeQuestion={handleRemoveQuestion}
-                removeVariant={handleRemoveVariant}
-                handleUpdateVariantTitle={handleUpdateVariantTitle}
-              />
-            ))}
-          </div>
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="questions">
+              {(provided) => (
+                <div ref={provided.innerRef} {...provided.droppableProps}>
+                  {questions.map((question, index) => (
+                    <Draggable
+                      key={index}
+                      draggableId={`question-${index}`}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <CreateQuestion
+                            question={question}
+                            questionIndex={index}
+                            setQuestion={handleUpdateQuestion}
+                            removeQuestion={handleRemoveQuestion}
+                            removeVariant={handleRemoveVariant}
+                            handleUpdateVariantTitle={handleUpdateVariantTitle}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
 
           <div className="flex justify-end">
             <Button

@@ -2,8 +2,11 @@ import { Layout, PageHeader } from "@components/common";
 import { PlusIcon } from "@heroicons/react/20/solid";
 import { Button, Typography } from "@material-tailwind/react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function Surveys() {
+  const { push } = useRouter();
+
   const surveys = [
     { title: "Задоволення продукцією", href: "/satisfaction" },
     { title: "Уподобання смаку", href: "/satisfaction" },
@@ -20,14 +23,14 @@ export default function Surveys() {
       <PageHeader text="Актуальні опитування" />
       <div className="grid grid-cols-3 w-full gap-10">
         <Link
-          href="/surveys/create"
+          href="/surveys/createOrEdit"
           className="group border-2 border-primary-blue h-[250px] hover:bg-primary-blue rounded-xl flex justify-center items-center transition-all"
         >
           <PlusIcon className="text-primary-blue group-hover:text-white h-10 w-10 transition-all" />
         </Link>
         {surveys.map(({ title, href }) => (
-          <Link
-            href={"/survey" + href}
+          <div
+            onClick={() => (isAdmin ? {} : push("/survey" + href))}
             key={title}
             className="group flex justify-center h-[250px] rounded-xl bg-primary-blue relative"
           >
@@ -41,14 +44,18 @@ export default function Surveys() {
               {title}
             </Typography>
             <div className="absolute top-0 left-0 justify-center items-center flex-col gap-2 h-full w-full hidden group-hover:flex">
-              <Button color="yellow" variant="outlined">
+              <Button
+                color="yellow"
+                variant="outlined"
+                onClick={() => push("/surveys/createOrEdit")}
+              >
                 Редагувати
               </Button>
               <Button color="red" variant="outlined">
                 Видалити
               </Button>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
     </Layout>

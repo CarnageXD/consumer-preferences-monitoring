@@ -1,6 +1,6 @@
 import { EditableInput, Textarea } from "@components/common";
 import {
-  CheckIcon,
+  ArrowsUpDownIcon,
   PlusCircleIcon,
   TrashIcon,
   XMarkIcon,
@@ -8,7 +8,6 @@ import {
 import {
   Button,
   IconButton,
-  Input,
   Option,
   Select,
   Typography,
@@ -55,11 +54,14 @@ export const CreateQuestion = ({
   return (
     <div className="border px-4 py-2 rounded-xl border-gray-500">
       <div className="flex justify-between items-center">
-        <EditableInput
-          inputClassName="mr-4"
-          value={localTitle}
-          setValue={handleTitleChange}
-        />
+        <div className="flex items-center gap-2">
+          <ArrowsUpDownIcon className="text-gray-500 h-5 w-5 cursor-pointer" />
+          <EditableInput
+            inputClassName="mr-4"
+            value={localTitle}
+            setValue={handleTitleChange}
+          />
+        </div>
         <div className="flex items-center gap-4">
           <div className="w-[200px]">
             <Select
