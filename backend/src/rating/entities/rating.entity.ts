@@ -5,8 +5,8 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity()
 export class RatingEntity extends BaseEntity {
-  @Column()
-  rating: number;
+  @Column({ type: 'real' })
+  rating: string;
 
   @ManyToOne(() => ProductEntity, (product) => product.rating)
   product: ProductEntity;

@@ -27,6 +27,7 @@ export const ProductsFilter = ({ setFilter }: ProductFilterProps) => {
       </Typography>
       {filters.map((filter) => (
         <Typography
+          key={filter.title}
           onClick={() => handleSetFilter(filter.value)}
           className="cursor-pointer transition-all text-center py-3 text-white w-full hover:bg-blue-900/50 font-medium hover:text-primary-yellow rounded-xl"
         >

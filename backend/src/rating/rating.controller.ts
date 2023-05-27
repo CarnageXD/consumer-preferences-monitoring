@@ -13,6 +13,11 @@ export class RatingController {
     return this.ratingService.createOrUpdate(rating);
   }
 
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.ratingService.remove(+id);
+  }
+
   @Get()
   findAll() {
     return this.ratingService.findAll();
@@ -21,10 +26,5 @@ export class RatingController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.ratingService.findOne(+id);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ratingService.remove(+id);
   }
 }

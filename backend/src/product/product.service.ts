@@ -23,8 +23,15 @@ export class ProductService {
     return this.repository.find(options);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  findOne(tag: string) {
+    const product = this.repository.findOne({
+      where: {
+        tag,
+      },
+      relations: ['review', 'rating', 'rating.user'],
+    });
+
+    return product;
   }
 
   remove(id: number) {

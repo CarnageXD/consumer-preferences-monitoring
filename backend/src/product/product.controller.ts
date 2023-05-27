@@ -3,8 +3,8 @@ import { ProductService } from './product.service';
 import { CreateOrUpdateProductDto } from './dto/create.update.product.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@Controller('product')
-@ApiTags('product')
+@Controller('products')
+@ApiTags('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
@@ -18,9 +18,9 @@ export class ProductController {
     return this.productService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productService.findOne(+id);
+  @Get(':tag')
+  findOne(@Param('tag') tag: string) {
+    return this.productService.findOne(tag);
   }
 
   @Delete(':id')

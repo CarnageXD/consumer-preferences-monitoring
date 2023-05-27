@@ -37,3 +37,7 @@ input::before {
 button[role="combobox"] span.absolute {
   @apply pt-0 pl-3;
 }
+
+svg.star-svg {
+  display: inline;
+}

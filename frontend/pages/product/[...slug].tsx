@@ -1,35 +1,88 @@
-import React, { useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import { Layout } from "@components/common";
 import { Product } from "@types";
 import Image from "next/image";
-import { Button, Rating, Typography } from "@material-tailwind/react";
+import { Button, Typography } from "@material-tailwind/react";
 import { Textarea } from "@components/common";
+import { getApiUrl } from "@utils";
+import { Rating } from "react-simple-star-rating";
+import useSWRMutation from "swr/mutation";
+import { mutationFetcher } from "@utils/mutation-fetcher";
 
-export default function Product() {
-  const [rate, setRate] = useState(4);
+export default function ProductPage({ product }: { product: Product }) {
+  const userId = 1;
+  const [avgRate, setAvgRate] = useState(0);
+  const [userRate, setUserRate] = useState<number | null>(null);
 
-  const mockedProduct: Omit<Product, "tag"> = {
-    name: "Український",
-    description:
-      "Сир твердий «Український» ТМ «Пирятин» — один з фаворитів серед любителів традиційних сирів. Він виготовляється з натурального коров’ячого молока, має приємний, яскраво виражений сирний смак з легкою кислинкою та містить велику кількість корисних вітамінів та мікроелементів, що робить його незамінним продуктом у раціоні людини. Сир твердий «Український» ТМ «Пирятин» використовують як самостійну закуску, так і доповнення до різноманітних страв. Цей сир стане чудовим інгредієнтом гарячих бутербродів, піци, макаронних виробів, салатів тощо.",
-    image:
-      "https://milkalliance.com.ua/uploads/gallery_photo/photo/0393/78.png",
-    type: "packaged",
-    netWeight: "90",
-    form: "Брикет",
-    packaging: "Флоу-пак",
-    periodAndTermsOfStorage: "120 діб за температури -4...+8°С",
-  };
+  const { data: latestRating, trigger: addRate } = useSWRMutation(
+    getApiUrl("rating"),
+    mutationFetcher("POST")
+  );
+
+  const { trigger: removeRate } = useSWRMutation(
+    getApiUrl(
+      `rating/${
+        product.rating.find((rate) => rate.user.id === userId)?.id ||
+        latestRating?.id
+      }`
+    ),
+    mutationFetcher("DELETE")
+  );
 
   const tableData = [
-    { title: "Упаковка", value: mockedProduct.packaging },
-    { title: "Форма", value: mockedProduct.form },
-    { title: "Маса нетто", value: mockedProduct.netWeight + "g" },
+    { title: "Упаковка", value: product?.packaging },
+    { title: "Форма", value: product?.form },
+    { title: "Маса нетто", value: product?.netWeight + "g" },
     {
       title: "Термін та умови зберігання",
-      value: mockedProduct.periodAndTermsOfStorage,
+      value: product?.periodAndTermsOfStorage,
     },
   ];
+
+  const handleAddRate = (value: string) => {
+    setUserRate(+value);
+
+    const rating = { userId, productId: product.id, rating: value };
+
+    addRate(rating);
+  };
+
+  const handleRemoveRate = () => {
+    setUserRate(null);
+    removeRate();
+  };
+
+  useLayoutEffect(() => {
+    const totalRatingCount = product.rating.length;
+
+    if (!totalRatingCount && !userRate) {
+      setAvgRate(0);
+      return;
+    }
+
+    const sumRating = product.rating.reduce(
+      (prev, cur) => prev + cur.rating,
+      0
+    );
+
+    const averageRating = userRate
+      ? (sumRating + userRate) / (totalRatingCount + 1)
+      : sumRating / totalRatingCount;
+
+    setAvgRate(averageRating);
+  }, [userRate]);
+
+  useLayoutEffect(() => {
+    const userRating = product.rating.find((rate) => rate.user.id === userId);
+
+    if (userRating) {
+      setUserRate(userRating.rating);
+    }
+  }, []);
+
+  if (!product) {
+    return null;
+  }
 
   return (
     <Layout>
@@ -38,22 +91,20 @@ export default function Product() {
           <Image
             width={680}
             height={680}
-            src={mockedProduct.image}
-            alt={mockedProduct.name}
+            src={product.image}
+            alt={product.name}
           />
         </div>
         <div className="mt-8 flex flex-col gap-8">
           <div className="flex justify-between items-center">
             <Typography className="font-bold text-2xl">
-              {mockedProduct.name}
+              {product.name}
             </Typography>
             <Typography className="text-gray-900 font-medium text-sm uppercase">
               сири тверді фасовані
             </Typography>
           </div>
-          <Typography className="text-lg">
-            {mockedProduct.description}
-          </Typography>
+          <Typography className="text-lg">{product.description}</Typography>
           <table className="bg-gray-300 min-w-fit">
             <tbody>
               {tableData.map(({ title, value }) => (
@@ -69,9 +120,30 @@ export default function Product() {
               Оцінити товар:
             </Typography>
             <div className="flex items-center gap-2">
-              <Rating value={rate} onChange={(value) => setRate(value)} />
+              <div className="flex flex-col items-center">
+                <Rating
+                  initialValue={userRate || avgRate}
+                  allowFraction
+                  onClick={(value) => {
+                    handleAddRate(value.toString());
+                  }}
+                />
+                {userRate && (
+                  <Typography
+                    onClick={handleRemoveRate}
+                    className="cursor-pointer text-sm hover:text-red-500"
+                  >
+                    Видалити оцінку
+                  </Typography>
+                )}
+              </div>
               <Typography color="blue-gray" className="font-medium">
-                {rate}.0 середній рейтинг
+                {userRate
+                  ? userRate.toFixed(1) +
+                    " Ваша оцінка (Середній рейтинг: " +
+                    avgRate.toFixed(1) +
+                    ")"
+                  : avgRate.toFixed(1) + " Середній рейтинг"}
               </Typography>
             </div>
           </div>
@@ -89,3 +161,24 @@ export default function Product() {
     </Layout>
   );
 }
+
+export const getServerSideProps = async ({
+  query,
+}: {
+  query: { slug: string[] };
+}) => {
+  try {
+    const tag = query.slug[0];
+    const url = getApiUrl(`products/${tag}`);
+
+    console.log("url", url);
+
+    const res = await fetch(url);
+    const product = await res.json();
+
+    return { props: { product } };
+  } catch (error) {
+    console.error(error);
+    return { props: { product: null } };
+  }
+};
