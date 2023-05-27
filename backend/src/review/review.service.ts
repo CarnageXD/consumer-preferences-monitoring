@@ -17,9 +17,9 @@ export class ReviewService {
     private userRepository: Repository<UserEntity>,
   ) {}
 
-  async createOrUpdate(review: CreateOrUpdateReviewDto) {
+  async createOrUpdate(newReview: CreateOrUpdateReviewDto) {
     const product = await this.productRepository.findOne({
-      where: { id: review.productId },
+      where: { id: newReview.productId },
     });
 
     if (!product) {
@@ -27,19 +27,22 @@ export class ReviewService {
     }
 
     const user = await this.userRepository.findOne({
-      where: { id: review.userId },
+      where: { id: newReview.userId },
     });
 
     if (!user) {
       throw new Error('User not found');
     }
 
-    return this.repository.save({
-      content: review.content,
-      recommended: review.recommended,
+    const dataToSave = {
+      name: newReview.name,
+      content: newReview.content,
+      recommended: newReview.recommended,
       product,
       user,
-    });
+    };
+
+    return this.repository.save(dataToSave);
   }
 
   findAll() {

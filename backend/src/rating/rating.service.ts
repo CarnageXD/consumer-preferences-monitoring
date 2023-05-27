@@ -11,7 +11,9 @@ export class RatingService {
   constructor(
     @InjectRepository(RatingEntity)
     private repository: Repository<RatingEntity>,
+    @InjectRepository(ProductEntity)
     private productRepository: Repository<ProductEntity>,
+    @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
   ) {}
 
@@ -32,9 +34,13 @@ export class RatingService {
       throw new Error('User not found');
     }
 
-    const rating = await this.repository.findOne({
-      where: { product, user },
-    });
+    const rating = await this.repository
+      .createQueryBuilder('rating')
+      .leftJoinAndSelect('rating.product', 'product')
+      .leftJoinAndSelect('rating.user', 'user')
+      .where('product.id = :productId', { productId: newRating.productId })
+      .andWhere('user.id = :userId', { userId: newRating.userId })
+      .getOne();
 
     const dataToSave = {
       rating: newRating.rating,
@@ -43,10 +49,8 @@ export class RatingService {
     };
 
     if (rating) {
-      this.repository.save({
-        id: rating.id,
-        ...dataToSave,
-      });
+      rating.rating = newRating.rating;
+      return this.repository.save(rating);
     }
 
     return this.repository.save(dataToSave);
