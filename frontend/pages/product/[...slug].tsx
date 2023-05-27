@@ -2,17 +2,41 @@ import React, { useLayoutEffect, useState } from "react";
 import { Layout } from "@components/common";
 import { Product } from "@types";
 import Image from "next/image";
-import { Button, Typography } from "@material-tailwind/react";
+import { Button, Input, Typography } from "@material-tailwind/react";
 import { Textarea } from "@components/common";
 import { getApiUrl } from "@utils";
 import { Rating } from "react-simple-star-rating";
 import useSWRMutation from "swr/mutation";
 import { mutationFetcher } from "@utils/mutation-fetcher";
+import {
+  HandThumbDownIcon,
+  HandThumbUpIcon,
+} from "@heroicons/react/24/outline";
+import {
+  HandThumbDownIcon as ThumbDownSolid,
+  HandThumbUpIcon as ThumbUpSolid,
+} from "@heroicons/react/24/solid";
 
 export default function ProductPage({ product }: { product: Product }) {
   const userId = 1;
   const [avgRate, setAvgRate] = useState(0);
   const [userRate, setUserRate] = useState<number | null>(null);
+  const [reviewName, setReviewName] = useState("");
+  const [reviewText, setReviewText] = useState("");
+  const [reviewSubmitError, setReviewSubmitError] = useState("");
+  const [recommendProduct, setRecommendProduct] = useState<null | boolean>(
+    null
+  );
+  const [localReviews, setLocalReviews] = useState<any>(product.review);
+
+  console.log("localReviews", localReviews);
+
+  const { data: reviews, trigger: addReview } = useSWRMutation(
+    getApiUrl("review"),
+    mutationFetcher("POST")
+  );
+
+  console.log("reviews", reviews);
 
   const { data: latestRating, trigger: addRate } = useSWRMutation(
     getApiUrl("rating"),
@@ -49,7 +73,36 @@ export default function ProductPage({ product }: { product: Product }) {
 
   const handleRemoveRate = () => {
     setUserRate(null);
+    //@ts-ignore
     removeRate();
+  };
+
+  const handleReview = async () => {
+    if (!reviewName || !reviewText || recommendProduct === null) {
+      setReviewSubmitError("Заповніть всі поля!");
+      return;
+    }
+
+    if (reviewText.length < 10) {
+      setReviewSubmitError("Мінімальна довжина відгуку 10 символів");
+      return;
+    }
+
+    setReviewSubmitError("");
+
+    const review: any = await addReview({
+      name: reviewName,
+      content: reviewText,
+      recommended: recommendProduct,
+      productId: product.id,
+      userId,
+    });
+
+    setLocalReviews((prevReviews: any) => [...prevReviews, review]);
+
+    setReviewName("");
+    setReviewText("");
+    setRecommendProduct(null);
   };
 
   useLayoutEffect(() => {
@@ -85,7 +138,7 @@ export default function ProductPage({ product }: { product: Product }) {
   }
 
   return (
-    <Layout>
+    <Layout className="pb-24">
       <div className="grid md:grid-cols-2">
         <div>
           <Image
@@ -101,6 +154,7 @@ export default function ProductPage({ product }: { product: Product }) {
               {product.name}
             </Typography>
             <Typography className="text-gray-900 font-medium text-sm uppercase">
+              {/*TODO: add enum*/}
               сири тверді фасовані
             </Typography>
           </div>
@@ -148,14 +202,89 @@ export default function ProductPage({ product }: { product: Product }) {
             </div>
           </div>
           <div>
-            <Typography className="text-xl font-medium">
+            <Typography className="text-xl mb-2 font-medium">
               Залишити свій відгук про товар:
             </Typography>
-            <Textarea />
+            <Input
+              value={reviewName}
+              onChange={(e) => setReviewName(e.target.value)}
+              placeholder="Введіть ім'я"
+            />
+            <Textarea
+              value={reviewText}
+              setValue={setReviewText}
+              placeholder="Введіть відгук"
+            />
+            <div className="flex justify-end mb-4 gap-2">
+              <Typography className="text-lg">
+                Чи рекомендуєте ви цей товар?
+              </Typography>
+              {!recommendProduct && recommendProduct !== null ? (
+                <ThumbDownSolid
+                  onClick={() => setRecommendProduct(false)}
+                  className="h-6 w-6 text-primary-crimson cursor-pointer"
+                />
+              ) : (
+                <HandThumbDownIcon
+                  onClick={() => setRecommendProduct(false)}
+                  className="h-6 w-6 cursor-pointer"
+                />
+              )}
+
+              {recommendProduct ? (
+                <ThumbUpSolid
+                  onClick={() => setRecommendProduct(true)}
+                  className="h-6 w-6 text-primary-blue cursor-pointer"
+                />
+              ) : (
+                <HandThumbUpIcon
+                  onClick={() => setRecommendProduct(true)}
+                  className="h-6 w-6 cursor-pointer"
+                />
+              )}
+            </div>
+            {reviewSubmitError && (
+              <div className="flex mb-2 justify-end">
+                <Typography className="text-sm font-medium text-red-600">
+                  {reviewSubmitError}
+                </Typography>
+              </div>
+            )}
             <div className="flex justify-end">
-              <Button className="bg-primary-blue">Залишити відгук</Button>
+              <Button onClick={handleReview} className="bg-primary-blue">
+                Залишити відгук
+              </Button>
             </div>
           </div>
+          {!!product.review.length && (
+            <div>
+              <Typography className="text-xl mb-2 font-medium">
+                Відгуки про товар:
+              </Typography>
+              {localReviews
+                //@ts-ignore
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .map((rev: any) => (
+                  <div
+                    key={rev.id}
+                    className={`mb-4 ${
+                      rev.recommended ? "bg-green-100" : "bg-red-100"
+                    } py-2 px-4 rounded-xl`}
+                  >
+                    <div className="flex justify-between items-center mb-1">
+                      <Typography className="font-medium text-lg">
+                        {rev.name}
+                      </Typography>
+                      <Typography className="italic">
+                        {rev.recommended ? "Рекомендує" : "Не рекомендує"} цей
+                        товар
+                      </Typography>
+                    </div>
+                    <Typography>{rev.content}</Typography>
+                  </div>
+                ))}
+            </div>
+          )}
         </div>
       </div>
     </Layout>
