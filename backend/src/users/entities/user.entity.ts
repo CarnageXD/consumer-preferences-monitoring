@@ -1,5 +1,7 @@
+import { RatingEntity } from '@rating/entities/rating.entity';
+import { ReviewEntity } from '@review/entities/review.entity';
 import { BaseEntity } from '@utils/entities/base.entity';
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -21,6 +23,12 @@ export class UserEntity extends BaseEntity {
   @Column()
   password: string;
 
-  @Column({ default: UserRole.CLIENT })
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.CLIENT })
   role: UserRole;
+
+  @OneToMany(() => RatingEntity, (rating) => rating.product)
+  rating: RatingEntity[];
+
+  @OneToMany(() => ReviewEntity, (review) => review.product)
+  review: ReviewEntity[];
 }
