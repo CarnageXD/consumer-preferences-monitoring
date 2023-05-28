@@ -3,6 +3,9 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { CreateOrUpdateUserDto } from './dto/create.update.user.dto';
+import { LoginUserDto } from './dto/login.user.dto';
+import { UnauthorizedException } from '@nestjs/common';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -11,14 +14,58 @@ export class UsersService {
     private repository: Repository<UserEntity>,
   ) {}
 
-  create(newUser: CreateOrUpdateUserDto) {
-    const user = this.repository.findOne({ where: { email: newUser.email } });
+  async create(newUser: CreateOrUpdateUserDto) {
+    const user = await this.repository.findOne({
+      where: { email: newUser.email },
+    });
 
     if (user) {
-      return this.repository.save(newUser);
+      throw new Error('User with this email already exists');
     }
 
-    return this.repository.save(newUser);
+    const hashedPassword = await bcrypt.hash(newUser.password, 10);
+
+    const userToCreate = {
+      ...newUser,
+      password: hashedPassword,
+    };
+
+    this.repository.save(userToCreate);
+
+    return {
+      id: user.id,
+      firstName: newUser.firstName,
+      email: newUser.email,
+      lastName: newUser.lastName,
+      role: newUser.role,
+    };
+  }
+
+  async login(credentials: LoginUserDto) {
+    const user = await this.repository.findOne({
+      where: { email: credentials.email },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      credentials.password,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    return {
+      id: user.id,
+      firstName: user.firstName,
+      email: user.email,
+      lastName: user.lastName,
+      role: user.role,
+    };
   }
 
   findAll() {

@@ -27,8 +27,9 @@ export default function Products({ products }: { products: Product[] }) {
         />
       </div>
       <div className="mt-8">
-        <div className="grid grid-cols-[0.15fr_1fr] gap-10">
-          <ProductsFilter setFilter={setFilter} />
+        <Typography className="font-medium text-2xl mb-6">Продукція</Typography>
+        <div className="grid grid-cols-[0fr_1fr] gap-10">
+          <div></div>
           {products && <ProductsGrid products={products} />}
         </div>
       </div>

@@ -16,9 +16,12 @@ import {
   HandThumbDownIcon as ThumbDownSolid,
   HandThumbUpIcon as ThumbUpSolid,
 } from "@heroicons/react/24/solid";
+import { useAuth } from "@context/auth";
+import { useRouter } from "next/router";
 
 export default function ProductPage({ product }: { product: Product }) {
-  const userId = 1;
+  const { user, isAuthenticated } = useAuth();
+  const userId = user?.id;
   const [avgRate, setAvgRate] = useState(0);
   const [userRate, setUserRate] = useState<number | null>(null);
   const [reviewName, setReviewName] = useState("");
@@ -29,7 +32,7 @@ export default function ProductPage({ product }: { product: Product }) {
   );
   const [localReviews, setLocalReviews] = useState<any>(product.review);
 
-  console.log("localReviews", localReviews);
+  const { push } = useRouter();
 
   const { data: reviews, trigger: addReview } = useSWRMutation(
     getApiUrl("review"),
@@ -64,6 +67,11 @@ export default function ProductPage({ product }: { product: Product }) {
   ];
 
   const handleAddRate = (value: string) => {
+    if (!isAuthenticated) {
+      push("/login");
+      return;
+    }
+
     setUserRate(+value);
 
     const rating = { userId, productId: product.id, rating: value };
@@ -85,6 +93,11 @@ export default function ProductPage({ product }: { product: Product }) {
 
     if (reviewText.length < 10) {
       setReviewSubmitError("Мінімальна довжина відгуку 10 символів");
+      return;
+    }
+
+    if (!isAuthenticated) {
+      push("/login");
       return;
     }
 

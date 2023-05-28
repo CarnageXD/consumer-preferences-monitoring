@@ -6,6 +6,8 @@ import {
   MenuHandler,
   MenuList,
   MenuItem,
+  Typography,
+  Button,
 } from "@material-tailwind/react";
 import {
   XMarkIcon,
@@ -16,11 +18,13 @@ import Image from "next/image";
 import LogoImg from "@public/logo.png";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useAuth } from "@context/auth";
 
 export const Navbar = () => {
+  const { isAuthenticated, user, logout } = useAuth();
   const [openNav, setOpenNav] = useState(false);
 
-  const { pathname } = useRouter();
+  const { pathname, push } = useRouter();
 
   const links = [
     { href: "/", title: "Головна" },
@@ -43,7 +47,8 @@ export const Navbar = () => {
     return () => window.removeEventListener("resize", handleEffect);
   }, []);
 
-  const isAnalytic = true;
+  console.log("user", user);
+  const isAnalyst = user?.role === "ANALYST";
 
   return (
     <MTNavbar
@@ -57,7 +62,7 @@ export const Navbar = () => {
         <div className="flex items-center gap-8">
           <ul className="hidden lg:flex gap-8 font-semibold">
             {links.map(({ href, title }) => {
-              if (!isAnalytic && href === "/analytics") {
+              if (!isAnalyst && href === "/analytics") {
                 return null;
               }
 
@@ -74,15 +79,25 @@ export const Navbar = () => {
               );
             })}
           </ul>
-          <Menu>
-            <MenuHandler>
-              <UserCircleIcon className="cursor-pointer h-8 w-8" />
-            </MenuHandler>
-            <MenuList>
-              <MenuItem>Редагувати профіль</MenuItem>
-              <MenuItem>Вийти</MenuItem>
-            </MenuList>
-          </Menu>
+          {isAuthenticated ? (
+            <Menu>
+              <MenuHandler>
+                <UserCircleIcon className="cursor-pointer h-8 w-8" />
+              </MenuHandler>
+              <MenuList>
+                <MenuItem onClick={() => logout()}>Вийти</MenuItem>
+              </MenuList>
+            </Menu>
+          ) : (
+            <Button
+              onClick={() => push("/login")}
+              color="yellow"
+              size="sm"
+              className="border-l border-l-primary-yellow font-medium"
+            >
+              Увійти
+            </Button>
+          )}
         </div>
         <IconButton
           color="yellow"

@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Layout } from "@components/common";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/20/solid";
 import { Button, Input, Typography } from "@material-tailwind/react";
 import { useForm } from "react-hook-form";
 import CheeseImg from "@public/login-cheese.png";
+import useSWRMutation from "swr/mutation";
+import { getApiUrl } from "@utils";
+import mutationFetcher from "@utils/mutation-fetcher";
+import { useAuth } from "@context/auth";
+import { useRouter } from "next/router";
 
 const ErrorMessage = ({ message }: { message: string }) => {
   return (
@@ -15,17 +20,59 @@ const ErrorMessage = ({ message }: { message: string }) => {
 };
 
 export default function Login() {
-  const [isRegistered, setRegistered] = useState(false);
+  const { isAuthenticated, login } = useAuth();
+  const [isLoginError, setIsLoginError] = useState(false);
+  const [isRegistered, setRegistered] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+
+  const { push } = useRouter();
+
+  const { trigger: registerUser } = useSWRMutation(
+    getApiUrl("users"),
+    mutationFetcher("POST")
+  );
+
+  const { trigger: loginUser } = useSWRMutation(
+    getApiUrl("users/login"),
+    mutationFetcher("POST")
+  );
 
   const {
     register,
     handleSubmit: onSubmit,
     formState: { errors },
-    reset,
+    getValues,
   } = useForm();
 
-  const handleSubmit = () => {};
+  const handleSubmit = async () => {
+    if (isRegistered) {
+      const values = getValues();
+
+      const user = await loginUser({
+        email: values.email,
+        password: values.password,
+      });
+
+      if (user?.email) {
+        login(crypto.randomUUID(), user);
+      } else {
+        setIsLoginError(true);
+      }
+      return;
+    }
+
+    const user = await registerUser(getValues());
+
+    if (user?.email) {
+      login(crypto.randomUUID(), user);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      push("/");
+    }
+  });
 
   const passwordInputProps = {
     onClick: () => setShowPassword((showPassword) => !showPassword),
@@ -108,10 +155,15 @@ export default function Login() {
             <EyeIcon {...passwordInputProps} />
           )}
         </div>
-        <div>
+        <div className="flex flex-col items-center">
           <Button type="submit" className="!bg-primary-yellow !text-black">
             {isRegistered ? "Увійти" : "Зареєструватись"}
           </Button>
+          {isLoginError && (
+            <Typography className="mt-2 text-center text-red-600 font-medium text-sm">
+              Помилка авторизації. Перевірте дані.
+            </Typography>
+          )}
         </div>
         <Typography
           onClick={() => setRegistered((isRegistered) => !isRegistered)}
