@@ -1,10 +1,12 @@
 import { Layout, PageHeader } from "@components/common";
+import { useAuth } from "@context/auth";
 import { PlusIcon } from "@heroicons/react/20/solid";
 import { Button, Typography } from "@material-tailwind/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
 export default function Surveys() {
+  const { isAuthenticated, user } = useAuth();
   const { push } = useRouter();
 
   const surveys = [
@@ -16,7 +18,7 @@ export default function Surveys() {
     { title: "Додаткові послуги та сервіс", href: "/satisfaction" },
   ];
 
-  const isAdmin = true;
+  const isAnalyst = user?.role === "ANALYST";
 
   return (
     <Layout className="pb-24">
@@ -30,31 +32,33 @@ export default function Surveys() {
         </Link>
         {surveys.map(({ title, href }) => (
           <div
-            onClick={() => (isAdmin ? {} : push("/survey" + href))}
+            onClick={() => (isAnalyst ? {} : push("/survey" + href))}
             key={title}
             className="group flex justify-center h-[250px] rounded-xl bg-primary-blue relative"
           >
             <Typography
               className={`flex justify-center text-xl items-center text-center text-white font-medium ${
-                isAdmin
+                isAnalyst
                   ? "group-hover:text-opacity-0"
                   : "group-hover:text-primary-yellow"
               } transition-all`}
             >
               {title}
             </Typography>
-            <div className="absolute top-0 left-0 justify-center items-center flex-col gap-2 h-full w-full hidden group-hover:flex">
-              <Button
-                color="yellow"
-                variant="outlined"
-                onClick={() => push("/surveys/createOrEdit")}
-              >
-                Редагувати
-              </Button>
-              <Button color="red" variant="outlined">
-                Видалити
-              </Button>
-            </div>
+            {isAnalyst && (
+              <div className="absolute top-0 left-0 justify-center items-center flex-col gap-2 h-full w-full hidden group-hover:flex">
+                <Button
+                  color="yellow"
+                  variant="outlined"
+                  onClick={() => push("/surveys/createOrEdit")}
+                >
+                  Редагувати
+                </Button>
+                <Button color="red" variant="outlined">
+                  Видалити
+                </Button>
+              </div>
+            )}
           </div>
         ))}
       </div>
