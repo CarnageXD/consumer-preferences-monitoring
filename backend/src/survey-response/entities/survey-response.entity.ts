@@ -15,6 +15,6 @@ export class SurveyResponseEntity extends BaseEntity {
   @ManyToOne(() => SurveyQuestionEntity, (question) => question.surveyResponses)
   question: SurveyQuestionEntity;
 
-  @Column()
-  answer: string;
+  @Column('simple-array', { nullable: true })
+  answers: string[];
 }

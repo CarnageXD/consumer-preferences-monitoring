@@ -1,4 +1,6 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateSurveyResponseDto } from './create-survey-response.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class UpdateSurveyResponseDto extends PartialType(CreateSurveyResponseDto) {}
+export class UpdateSurveyResponseDto {
+  @ApiProperty()
+  answers: string[];
+}

@@ -5,6 +5,7 @@ import { getApiUrl } from "@utils";
 import { useState } from "react";
 
 export default function Survey({ survey }: { survey: Survey }) {
+  console.log("survey", survey);
   const [values, setValues] = useState<Array<string | string[]>>([]);
 
   const handleAnswerChange = (questionIndex: number, answer: any) => {
