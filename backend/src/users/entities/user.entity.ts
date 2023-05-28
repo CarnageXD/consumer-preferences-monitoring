@@ -1,5 +1,6 @@
 import { RatingEntity } from '@rating/entities/rating.entity';
 import { ReviewEntity } from '@review/entities/review.entity';
+import { SurveyResponseEntity } from '@survey-response/entities/survey-response.entity';
 import { BaseEntity } from '@utils/entities/base.entity';
 import { Entity, Column, OneToMany } from 'typeorm';
 
@@ -9,7 +10,7 @@ export enum UserRole {
   ADMIN = 'ADMIN',
 }
 
-@Entity('users')
+@Entity()
 export class UserEntity extends BaseEntity {
   @Column()
   firstName: string;
@@ -31,4 +32,7 @@ export class UserEntity extends BaseEntity {
 
   @OneToMany(() => ReviewEntity, (review) => review.product)
   review: ReviewEntity[];
+
+  @OneToMany(() => SurveyResponseEntity, (response) => response.question)
+  surveyResponses: SurveyResponseEntity[];
 }

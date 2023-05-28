@@ -7,6 +7,9 @@ import { ConfigModule } from '@nestjs/config';
 import { RatingModule } from './rating/rating.module';
 import { ProductModule } from './product/product.module';
 import { ReviewModule } from './review/review.module';
+import { SurveyModule } from './survey/survey.module';
+import { SurveyQuestionModule } from './survey-question/survey-question.module';
+import { SurveyResponseModule } from './survey-response/survey-response.module';
 
 @Module({
   imports: [
@@ -25,12 +28,18 @@ import { ReviewModule } from './review/review.module';
         './review/entities/review.entity.ts',
         './rating/entities/rating.entity.ts',
         './product/entities/product.entity.ts',
+        './survey/entities/survey.entity.ts',
+        './survey-question/entities/survey-question.entity.ts',
+        './survey-response/entities/survey-response.entity.ts',
       ],
     }),
     UsersModule,
     RatingModule,
     ProductModule,
     ReviewModule,
+    SurveyModule,
+    SurveyQuestionModule,
+    SurveyResponseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
