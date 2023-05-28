@@ -62,7 +62,7 @@ export default function CreateOrUpdateSurvey({ survey }: { survey: Survey }) {
   const handleRemoveVariant = (questionIndex: number, variantIndex: number) => {
     setQuestions((prevQuestions) => {
       const updatedQuestions = JSON.parse(JSON.stringify(prevQuestions));
-      updatedQuestions[questionIndex].variants.splice(variantIndex, 1);
+      updatedQuestions[questionIndex].options.splice(variantIndex, 1);
       return updatedQuestions;
     });
   };

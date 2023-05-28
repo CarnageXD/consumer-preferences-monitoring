@@ -27,7 +27,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       uuid,
       user,
     };
-    Cookies.set("authData", JSON.stringify(data), { expires: 1 / 24 });
+    Cookies.set("authData", JSON.stringify(data), { expires: 6 / 24 });
     setIsAuthenticated(true);
   };
 
