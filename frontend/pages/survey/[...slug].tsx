@@ -1,36 +1,11 @@
 import { Layout, PageHeader, Textarea } from "@components/common";
 import { Button, Checkbox, Radio, Typography } from "@material-tailwind/react";
+import { Survey } from "@types";
+import { getApiUrl } from "@utils";
 import { useState } from "react";
 
-export default function Survey() {
-  const mockedSurvey = {
-    title: "Задоволення продукцією",
-    questions: [
-      {
-        question: "Як би ви оцінили загальну якість нашої продукції?",
-        variants: ["Погано", "Задовільно", "Відмінно"],
-        type: "radio",
-      },
-      {
-        question: "Якими словами ви описали б смак наших сирів?",
-        variants: [],
-        type: "text",
-      },
-      {
-        question: "Чи відповідає упаковка продукту вашим очікуванням?",
-        variants: ["Ні", "Так"],
-        type: "checkbox",
-      },
-      {
-        question: "Якими словами ви описали б смак наших сирів?",
-        variants: [],
-        type: "text",
-      },
-    ],
-  };
-
+export default function Survey({ survey }: { survey: Survey }) {
   const [values, setValues] = useState<Array<string | string[]>>([]);
-  console.log("values", values);
 
   const handleAnswerChange = (questionIndex: number, answer: any) => {
     setValues((prevValues) => {
@@ -41,15 +16,14 @@ export default function Survey() {
   };
 
   const handleSubmitSurvey = () => {
-    // Виконайте потрібні дії зі збереженими відповідями (values)
     console.log("Збережені відповіді:", values);
   };
 
   return (
     <Layout>
-      <PageHeader text={mockedSurvey.title} />
+      <PageHeader text={survey.title} />
       <div className="w-1/2 flex flex-col gap-4">
-        {mockedSurvey.questions.map(({ question, variants, type }, index) => {
+        {survey.questions.map(({ question, options, type }, index) => {
           return (
             <div key={index}>
               <Typography className="font-normal text-lg">
@@ -57,7 +31,7 @@ export default function Survey() {
               </Typography>
               <div className="flex gap-8">
                 {type === "radio" &&
-                  variants.map((variant, variantIndex) => (
+                  options.map((variant, variantIndex) => (
                     <Radio
                       key={variantIndex}
                       label={variant}
@@ -72,7 +46,7 @@ export default function Survey() {
                   />
                 )}
                 {type === "checkbox" &&
-                  variants.map((variant, variantIndex) => (
+                  options.map((variant, variantIndex) => (
                     <Checkbox
                       key={variantIndex}
                       label={variant}
@@ -107,3 +81,22 @@ export default function Survey() {
     </Layout>
   );
 }
+
+export const getServerSideProps = async ({
+  query,
+}: {
+  query: { slug: string[] };
+}) => {
+  try {
+    const id = query.slug[0];
+    const url = getApiUrl(`surveys/${id}`);
+
+    const res = await fetch(url);
+    const survey = await res.json();
+
+    return { props: { survey } };
+  } catch (error) {
+    console.error(error);
+    return { props: { survey: null } };
+  }
+};

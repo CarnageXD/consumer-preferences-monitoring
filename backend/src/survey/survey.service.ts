@@ -30,9 +30,7 @@ export class SurveyService {
   }
 
   async findAll(): Promise<SurveyEntity[]> {
-    return await this.surveyRepository.find({
-      relations: ['questions', 'responses'],
-    });
+    return await this.surveyRepository.find();
   }
 
   async findOne(id: number): Promise<SurveyEntity> {
@@ -80,7 +78,9 @@ export class SurveyService {
     }
 
     await this.questionRepository.remove(survey.questions);
-    return await this.surveyRepository.remove(survey);
+    const removedSurvey = await this.surveyRepository.remove(survey);
+
+    return { ...removedSurvey, id };
   }
 
   private createQuestion(questionDto: CreateQuestionDto) {

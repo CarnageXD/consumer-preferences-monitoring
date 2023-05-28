@@ -12,14 +12,11 @@ import {
   Select,
   Typography,
 } from "@material-tailwind/react";
+import { SurveyQuestion } from "@types";
 import React, { useState } from "react";
 
 interface CreateQuestionProps {
-  question: {
-    title: string;
-    type: "checkbox" | "radio" | "text";
-    variants: string[];
-  };
+  question: SurveyQuestion;
   questionIndex: number;
   setQuestion: (question: any, questionIndex: number) => void;
   removeQuestion: (index: number) => void;
@@ -39,7 +36,7 @@ export const CreateQuestion = ({
   removeVariant,
   handleUpdateVariantTitle,
 }: CreateQuestionProps) => {
-  const [localTitle, setLocalTitle] = useState(question.title);
+  const [localTitle, setLocalTitle] = useState(question.question);
 
   const handleSetQuestion = (type: string, value: any) => {
     const newQuestion = { ...question, [type]: value };
@@ -48,7 +45,7 @@ export const CreateQuestion = ({
 
   const handleTitleChange = (value: string) => {
     setLocalTitle(value);
-    handleSetQuestion("title", value);
+    handleSetQuestion("question", value);
   };
 
   return (
@@ -86,10 +83,14 @@ export const CreateQuestion = ({
       </div>
 
       {question.type === "text" && (
-        <Textarea placeholder="Текстова відповідь" />
+        <Textarea
+          readOnly
+          placeholder="Текстова відповідь"
+          className="hover:border-gray-300 focus:border-gray-300 active:border-gray-300"
+        />
       )}
       {(question.type === "radio" || question.type === "checkbox") &&
-        question.variants.map((variant, index) => (
+        question.options.map((option, index) => (
           <div key={index} className="mt-8 flex justify-between items-center">
             <div className="flex gap-2 items-center">
               <div
@@ -106,7 +107,7 @@ export const CreateQuestion = ({
                 )}
               </div>
               <EditableInput
-                value={variant}
+                value={option}
                 setValue={(value) =>
                   handleUpdateVariantTitle(value, questionIndex, index)
                 }
@@ -129,10 +130,7 @@ export const CreateQuestion = ({
           variant="outlined"
           className="mt-8 h-9 flex gap-2"
           onClick={() =>
-            handleSetQuestion("variants", [
-              ...question.variants,
-              "Новий варіант",
-            ])
+            handleSetQuestion("options", [...question.options, "Новий варіант"])
           }
         >
           <PlusCircleIcon className="text-primary-blue h-6 w-6" />

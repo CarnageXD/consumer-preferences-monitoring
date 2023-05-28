@@ -25,7 +25,7 @@ export const EditableInput = React.memo(
 
     useEffect(() => {
       if (!value && !isEdit) {
-        setValue("Натисніть зміни тексту");
+        setValue("Натисніть для зміни тексту");
       }
     }, [value, isEdit]);
 

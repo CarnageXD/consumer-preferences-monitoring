@@ -2,29 +2,42 @@ import { EditableInput, Layout, PageHeader } from "@components/common";
 import { CreateQuestion } from "@components/survey";
 import { PlusCircleIcon } from "@heroicons/react/20/solid";
 import { Button, Typography } from "@material-tailwind/react";
+import { Survey, SurveyQuestion } from "@types";
+import { getApiUrl } from "@utils";
+import mutationFetcher from "@utils/mutation-fetcher";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import useSWRMutation from "swr/mutation";
 
-interface QuestionType {
-  title: string;
-  variants: string[];
-  type: "checkbox" | "radio" | "text";
-}
-
-export default function CreateOrUpdateSurvey() {
-  const survey: QuestionType[] = [];
-
+export default function CreateOrUpdateSurvey({ survey }: { survey: Survey }) {
   const [title, setTitle] = useState(
-    "Нове опитування (натисніть, щоб змінити назву)"
+    survey.title || "Нове опитування (натисніть, щоб змінити назву)"
   );
-  const [questions, setQuestions] = useState<QuestionType[]>(survey || []);
+  const [questions, setQuestions] = useState<SurveyQuestion[]>(
+    survey.questions || []
+  );
+
+  const { push, query } = useRouter();
+
+  const { trigger: createSurvey } = useSWRMutation(
+    getApiUrl("surveys"),
+    mutationFetcher("POST")
+  );
+
+  const { trigger: updateSurvey } = useSWRMutation(
+    getApiUrl(`surveys/${query.id}`),
+    mutationFetcher("PATCH")
+  );
+
+  console.log("questions", questions);
 
   const handleAddQuestion = () => {
     setQuestions((prevQuestions) => [
       ...prevQuestions,
       {
-        title: `Питання ${prevQuestions.length + 1}`,
-        variants: ["Варіант 1"],
+        question: `Питання ${prevQuestions.length + 1}`,
+        options: ["Варіант 1"],
         type: "text",
       },
     ]);
@@ -38,7 +51,7 @@ export default function CreateOrUpdateSurvey() {
     });
   };
 
-  const handleUpdateQuestion = (question: QuestionType, index: number) => {
+  const handleUpdateQuestion = (question: SurveyQuestion, index: number) => {
     setQuestions((prevQuestions) => {
       const updatedQuestions = [...prevQuestions];
       updatedQuestions[index] = question;
@@ -61,12 +74,12 @@ export default function CreateOrUpdateSurvey() {
   ) => {
     setQuestions((prevQuestions) => {
       const updatedQuestions = [...prevQuestions];
-      updatedQuestions[questionIndex].variants[variantIndex] = title;
+      updatedQuestions[questionIndex].options[variantIndex] = title;
       return updatedQuestions;
     });
   };
 
-  const handleDragEnd = (result) => {
+  const handleDragEnd = (result: any) => {
     if (!result.destination) {
       return;
     }
@@ -78,12 +91,26 @@ export default function CreateOrUpdateSurvey() {
     setQuestions(updatedQuestions);
   };
 
+  const handleSaveSurvey = async () => {
+    const res = query.id
+      ? await updateSurvey({ title, questions })
+      : await createSurvey({ title, questions });
+
+    if (res.title) {
+      push("/surveys");
+    }
+  };
+
   return (
     <Layout className="pb-24 mb-0">
       <div className="max-w-2xl">
         <div className="flex justify-between items-center">
           <PageHeader text="Створення опитування" />
-          <Button disabled={questions.length < 2} className="mb-8">
+          <Button
+            onClick={handleSaveSurvey}
+            disabled={questions.length < 2}
+            className="mb-8"
+          >
             Зберегти опитування
           </Button>
         </div>
@@ -97,20 +124,21 @@ export default function CreateOrUpdateSurvey() {
           </div>
 
           <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="questions">
-              {(provided) => (
+            <Droppable droppableId="question-list">
+              {(provided: any) => (
                 <div ref={provided.innerRef} {...provided.droppableProps}>
                   {questions.map((question, index) => (
                     <Draggable
                       key={index}
-                      draggableId={`question-${index}`}
+                      draggableId={`question-${index}`} // Modified draggableId
                       index={index}
                     >
-                      {(provided) => (
+                      {(provided: any) => (
                         <div
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
+                          className="mt-6"
                         >
                           <CreateQuestion
                             question={question}
@@ -146,3 +174,23 @@ export default function CreateOrUpdateSurvey() {
     </Layout>
   );
 }
+
+export const getServerSideProps = async ({
+  query,
+}: {
+  query: { id: string[] };
+}) => {
+  console.log(query);
+  try {
+    const id = query.id;
+    const url = getApiUrl(`surveys/${id}`);
+
+    const res = await fetch(url);
+    const survey = await res.json();
+
+    return { props: { survey } };
+  } catch (error) {
+    console.error(error);
+    return { props: { survey: null } };
+  }
+};

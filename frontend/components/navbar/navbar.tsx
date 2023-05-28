@@ -47,7 +47,6 @@ export const Navbar = () => {
     return () => window.removeEventListener("resize", handleEffect);
   }, []);
 
-  console.log("user", user);
   const isAnalyst = user?.role === "ANALYST";
 
   return (

@@ -33,7 +33,6 @@ export class UsersService {
     this.repository.save(userToCreate);
 
     return {
-      id: user.id,
       firstName: newUser.firstName,
       email: newUser.email,
       lastName: newUser.lastName,
