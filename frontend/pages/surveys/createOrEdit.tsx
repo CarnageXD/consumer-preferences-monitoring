@@ -6,9 +6,9 @@ import { Survey, SurveyQuestion } from "@types";
 import { getApiUrl } from "@utils";
 import mutationFetcher from "@utils/mutation-fetcher";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import React, { useEffect, useState } from "react";
 import useSWRMutation from "swr/mutation";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 export default function CreateOrUpdateSurvey({ survey }: { survey: Survey }) {
   const [title, setTitle] = useState(
@@ -17,6 +17,8 @@ export default function CreateOrUpdateSurvey({ survey }: { survey: Survey }) {
   const [questions, setQuestions] = useState<SurveyQuestion[]>(
     survey.questions || []
   );
+
+  const [isBrowser, setIsBrowser] = useState(false);
 
   const { push, query } = useRouter();
 
@@ -79,18 +81,6 @@ export default function CreateOrUpdateSurvey({ survey }: { survey: Survey }) {
     });
   };
 
-  const handleDragEnd = (result: any) => {
-    if (!result.destination) {
-      return;
-    }
-
-    const updatedQuestions = Array.from(questions);
-    const [removedQuestion] = updatedQuestions.splice(result.source.index, 1);
-    updatedQuestions.splice(result.destination.index, 0, removedQuestion);
-
-    setQuestions(updatedQuestions);
-  };
-
   const handleSaveSurvey = async () => {
     const res = query.id
       ? await updateSurvey({ title, questions })
@@ -100,6 +90,28 @@ export default function CreateOrUpdateSurvey({ survey }: { survey: Survey }) {
       push("/surveys");
     }
   };
+
+  const handleDragEnd = (result) => {
+    if (!result.destination) {
+      return;
+    }
+
+    const updatedQuestions = Array.from(questions);
+    const [removed] = updatedQuestions.splice(result.source.index, 1);
+    updatedQuestions.splice(result.destination.index, 0, removed);
+
+    setQuestions(updatedQuestions);
+  };
+
+  if (typeof window === undefined) {
+    return null;
+  }
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsBrowser(true);
+    }
+  }, []);
 
   return (
     <Layout className="pb-24 mb-0">
@@ -124,38 +136,45 @@ export default function CreateOrUpdateSurvey({ survey }: { survey: Survey }) {
           </div>
 
           <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="question-list">
-              {(provided: any) => (
-                <div ref={provided.innerRef} {...provided.droppableProps}>
-                  {questions.map((question, index) => (
-                    <Draggable
-                      key={index}
-                      draggableId={`question-${index}`} // Modified draggableId
-                      index={index}
-                    >
-                      {(provided: any) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className="mt-6"
-                        >
-                          <CreateQuestion
-                            question={question}
-                            questionIndex={index}
-                            setQuestion={handleUpdateQuestion}
-                            removeQuestion={handleRemoveQuestion}
-                            removeVariant={handleRemoveVariant}
-                            handleUpdateVariantTitle={handleUpdateVariantTitle}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
+            {isBrowser && (
+              <Droppable droppableId="question-list">
+                {(provided) => (
+                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                    {questions.map((question, index) => (
+                      <Draggable
+                        key={question.id}
+                        draggableId={
+                          question.id?.toString() || index.toString()
+                        }
+                        index={index}
+                      >
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                          >
+                            <div className="mt-6">
+                              <CreateQuestion
+                                question={question}
+                                questionIndex={index}
+                                setQuestion={handleUpdateQuestion}
+                                removeQuestion={handleRemoveQuestion}
+                                removeVariant={handleRemoveVariant}
+                                handleUpdateVariantTitle={
+                                  handleUpdateVariantTitle
+                                }
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            )}
           </DragDropContext>
 
           <div className="flex justify-end">

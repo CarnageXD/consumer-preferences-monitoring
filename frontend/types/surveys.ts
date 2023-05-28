@@ -5,6 +5,7 @@ export interface Survey {
 }
 
 export interface SurveyQuestion {
+  id: number;
   question: string;
   type: "text" | "radio" | "checkbox";
   options: string[];
