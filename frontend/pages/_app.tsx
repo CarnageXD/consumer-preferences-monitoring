@@ -6,6 +6,7 @@ import { Navbar } from "@components/navbar";
 import { SWRConfig } from "swr";
 import { fetcher } from "@utils";
 import AuthProvider from "@context/auth";
+import Toaster from "@components/common/toaster";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -13,6 +14,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <ThemeProvider value={theme}>
         <AuthProvider>
           <Navbar />
+          <Toaster />
           <Component {...pageProps} />
         </AuthProvider>
       </ThemeProvider>

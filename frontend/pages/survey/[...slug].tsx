@@ -6,6 +6,7 @@ import { getApiUrl } from "@utils";
 import mutationFetcher from "@utils/mutation-fetcher";
 import { useRouter } from "next/router";
 import { useReducer } from "react";
+import { toast } from "react-hot-toast";
 import useSWRMutation from "swr/mutation";
 
 const initialState = [] as any;
@@ -106,6 +107,7 @@ export default function Survey({ survey }: { survey: Survey }) {
     console.log("res", res);
 
     if ("response" in res) {
+      toast.success("Опитування пройдене. Дякуємо за Ваш час.");
       push("/surveys");
     }
   };

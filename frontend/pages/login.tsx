@@ -10,6 +10,7 @@ import { getApiUrl } from "@utils";
 import mutationFetcher from "@utils/mutation-fetcher";
 import { useAuth } from "@context/auth";
 import { useRouter } from "next/router";
+import { toast } from "react-hot-toast";
 
 const ErrorMessage = ({ message }: { message: string }) => {
   return (
@@ -48,23 +49,25 @@ export default function Login() {
     if (isRegistered) {
       const values = getValues();
 
-      const user = await loginUser({
+      const res = await loginUser({
         email: values.email,
         password: values.password,
       });
 
-      if (user?.email) {
-        login(crypto.randomUUID(), user);
+      if (res?.access_token) {
+        toast.success("Авторизація успішна.");
+        login(res.access_token, res.user);
       } else {
         setIsLoginError(true);
       }
       return;
     }
 
-    const user = await registerUser(getValues());
+    const res = await registerUser(getValues());
 
-    if (user?.email) {
-      login(crypto.randomUUID(), user);
+    if (res?.access_token) {
+      toast.success("Реєстрація успішна.");
+      login(res.access_token, res.user);
     }
   };
 

@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from './entities/user.entity';
+import { UserEntity, UserRole } from './entities/user.entity';
 import { CreateOrUpdateUserDto } from './dto/create.update.user.dto';
 import { LoginUserDto } from './dto/login.user.dto';
 import { UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private repository: Repository<UserEntity>,
+    private jwtService: JwtService,
   ) {}
 
   async create(newUser: CreateOrUpdateUserDto) {
@@ -30,14 +32,38 @@ export class UsersService {
       password: hashedPassword,
     };
 
-    this.repository.save(userToCreate);
+    const createdUser = await this.repository.save(userToCreate);
+
+    const payload = {
+      email: createdUser.email,
+      role: createdUser.role,
+      sub: createdUser.id,
+    };
+    const access_token = this.jwtService.sign(payload);
 
     return {
-      firstName: newUser.firstName,
-      email: newUser.email,
-      lastName: newUser.lastName,
-      role: newUser.role,
+      user: {
+        id: createdUser.id,
+        firstName: newUser.firstName,
+        email: newUser.email,
+        lastName: newUser.lastName,
+        role: newUser.role,
+      },
+      access_token: access_token,
     };
+  }
+
+  async validateUser(email: string, role: UserRole): Promise<any> {
+    const user = await this.repository.findOne({
+      where: { email, role },
+    });
+
+    if (user) {
+      const { password, ...result } = user;
+      return result;
+    }
+
+    return null;
   }
 
   async login(credentials: LoginUserDto) {
@@ -58,12 +84,10 @@ export class UsersService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
+    const payload = { email: user.email, role: user.role, sub: user.id };
     return {
-      id: user.id,
-      firstName: user.firstName,
-      email: user.email,
-      lastName: user.lastName,
-      role: user.role,
+      user,
+      access_token: this.jwtService.sign(payload),
     };
   }
 
@@ -72,7 +96,7 @@ export class UsersService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`;
+    return this.repository.findOne({ where: { id } });
   }
 
   remove(id: number) {

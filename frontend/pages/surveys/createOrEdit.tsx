@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import useSWRMutation from "swr/mutation";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { toast } from "react-hot-toast";
 
 export default function CreateOrUpdateSurvey({ survey }: { survey: Survey }) {
   const [title, setTitle] = useState(
@@ -87,6 +88,11 @@ export default function CreateOrUpdateSurvey({ survey }: { survey: Survey }) {
       : await createSurvey({ title, questions });
 
     if (res.title) {
+      if (query.id) {
+        toast.success("Опитування успішно оновлено.");
+      } else {
+        toast.success("Опитування успішно створене.");
+      }
       push("/surveys");
     }
   };

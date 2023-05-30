@@ -18,13 +18,14 @@ import {
 } from "@heroicons/react/24/solid";
 import { useAuth } from "@context/auth";
 import { useRouter } from "next/router";
+import { toast } from "react-hot-toast";
 
 export default function ProductPage({ product }: { product: Product }) {
   const { user, isAuthenticated } = useAuth();
   const userId = user?.id;
+  const userName = user?.firstName;
   const [avgRate, setAvgRate] = useState(0);
   const [userRate, setUserRate] = useState<number | null>(null);
-  const [reviewName, setReviewName] = useState("");
   const [reviewText, setReviewText] = useState("");
   const [reviewSubmitError, setReviewSubmitError] = useState("");
   const [recommendProduct, setRecommendProduct] = useState<null | boolean>(
@@ -66,7 +67,7 @@ export default function ProductPage({ product }: { product: Product }) {
     },
   ];
 
-  const handleAddRate = (value: string) => {
+  const handleAddRate = async (value: string) => {
     if (!isAuthenticated) {
       push("/login");
       return;
@@ -76,7 +77,10 @@ export default function ProductPage({ product }: { product: Product }) {
 
     const rating = { userId, productId: product.id, rating: value };
 
-    addRate(rating);
+    const res = await addRate(rating);
+    if (res) {
+      toast.success("Дякуємо за Вашу оцінку.");
+    }
   };
 
   const handleRemoveRate = () => {
@@ -86,7 +90,7 @@ export default function ProductPage({ product }: { product: Product }) {
   };
 
   const handleReview = async () => {
-    if (!reviewName || !reviewText || recommendProduct === null) {
+    if (!reviewText || recommendProduct === null) {
       setReviewSubmitError("Заповніть всі поля!");
       return;
     }
@@ -104,7 +108,7 @@ export default function ProductPage({ product }: { product: Product }) {
     setReviewSubmitError("");
 
     const review: any = await addReview({
-      name: reviewName,
+      name: userName,
       content: reviewText,
       recommended: recommendProduct,
       productId: product.id,
@@ -112,8 +116,8 @@ export default function ProductPage({ product }: { product: Product }) {
     });
 
     setLocalReviews((prevReviews: any) => [...prevReviews, review]);
+    toast.success("Дякуємо за Ваш відгук.");
 
-    setReviewName("");
     setReviewText("");
     setRecommendProduct(null);
   };
@@ -191,6 +195,7 @@ export default function ProductPage({ product }: { product: Product }) {
                 <Rating
                   initialValue={userRate || avgRate}
                   allowFraction
+                  allowHover={false}
                   onClick={(value) => {
                     handleAddRate(value.toString());
                   }}
@@ -218,11 +223,6 @@ export default function ProductPage({ product }: { product: Product }) {
             <Typography className="text-xl mb-2 font-medium">
               Залишити свій відгук про товар:
             </Typography>
-            <Input
-              value={reviewName}
-              onChange={(e) => setReviewName(e.target.value)}
-              placeholder="Введіть ім'я"
-            />
             <Textarea
               value={reviewText}
               setValue={setReviewText}
