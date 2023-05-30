@@ -1,3 +1,5 @@
+import { User } from "./user";
+
 export interface Product {
   id: number;
   name: string;
@@ -17,9 +19,8 @@ export interface Product {
 export interface Rating {
   id: number;
   rating: number;
-  user: {
-    id: number;
-  };
+  user: User;
+  product: Product;
 }
 
 export interface Review {
@@ -27,6 +28,8 @@ export interface Review {
   name: string;
   content: string;
   recommended: boolean;
+  user: User;
+  product: Product;
 }
 
 export type ProductType = "processed" | "weighted" | "packaged";

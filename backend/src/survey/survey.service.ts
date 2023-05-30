@@ -30,7 +30,9 @@ export class SurveyService {
   }
 
   async findAll(): Promise<SurveyEntity[]> {
-    return await this.surveyRepository.find();
+    return await this.surveyRepository.find({
+      relations: ['questions', 'responses'],
+    });
   }
 
   async findOne(id: number): Promise<SurveyEntity> {
