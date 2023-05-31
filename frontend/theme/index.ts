@@ -5,5 +5,16 @@ import { checkbox } from "./checkbox";
 import { input } from "./input";
 import { menu } from "./menu";
 import { select } from "./select";
+import { tab, tabsHeader } from "./tabs";
 
-export const theme = { button, textarea, radio, checkbox, input, menu, select };
+export const theme = {
+  button,
+  textarea,
+  radio,
+  checkbox,
+  input,
+  menu,
+  select,
+  tab,
+  tabsHeader,
+};

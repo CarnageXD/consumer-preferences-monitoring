@@ -56,7 +56,9 @@ export class ReviewService {
     });
   }
 
-  remove(id: number) {
-    return this.repository.delete(id);
+  async remove(id: number) {
+    this.repository.delete(id);
+
+    return { id };
   }
 }

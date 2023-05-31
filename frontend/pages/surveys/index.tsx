@@ -28,7 +28,6 @@ export default function Surveys({ surveys }: { surveys: Survey[] }) {
   const handleRemoval = async () => {
     const removedSurvey: Survey = await removeSurvey({});
 
-    console.log("removedSurvey", removedSurvey);
     const newSurveys = localSurveys.filter(
       (survey) => survey.id !== removedSurvey.id
     );
