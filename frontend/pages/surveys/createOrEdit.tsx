@@ -36,6 +36,7 @@ export default function CreateOrUpdateSurvey({ survey }: { survey: Survey }) {
   console.log("questions", questions);
 
   const handleAddQuestion = () => {
+    //@ts-ignore
     setQuestions((prevQuestions) => [
       ...prevQuestions,
       {
@@ -97,7 +98,7 @@ export default function CreateOrUpdateSurvey({ survey }: { survey: Survey }) {
     }
   };
 
-  const handleDragEnd = (result) => {
+  const handleDragEnd = (result: any) => {
     if (!result.destination) {
       return;
     }
@@ -144,7 +145,7 @@ export default function CreateOrUpdateSurvey({ survey }: { survey: Survey }) {
           <DragDropContext onDragEnd={handleDragEnd}>
             {isBrowser && (
               <Droppable droppableId="question-list">
-                {(provided) => (
+                {(provided: any) => (
                   <div ref={provided.innerRef} {...provided.droppableProps}>
                     {questions.map((question, index) => (
                       <Draggable
@@ -154,7 +155,7 @@ export default function CreateOrUpdateSurvey({ survey }: { survey: Survey }) {
                         }
                         index={index}
                       >
-                        {(provided) => (
+                        {(provided: any) => (
                           <div
                             ref={provided.innerRef}
                             {...provided.draggableProps}

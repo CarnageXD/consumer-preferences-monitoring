@@ -5,12 +5,17 @@ import AboutPreviewImg from "@public/about-preview.png";
 import SurveyPreviewImg from "@public/survey-preview.png";
 import { Product } from "@types";
 import { getApiUrl } from "@utils";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export default function Products({ products }: { products: Product[] }) {
   const [filter, setFilter] = useState("all");
+  console.log("filter", filter);
 
-  console.log(products);
+  const filteredProducts = useMemo(() => {
+    if (filter === "all") return products;
+
+    return products.filter((product) => product.type === filter);
+  }, [filter, products]);
 
   return (
     <Layout className="pb-24">
@@ -29,8 +34,8 @@ export default function Products({ products }: { products: Product[] }) {
       <div className="mt-8">
         <Typography className="font-medium text-2xl mb-6">Продукція</Typography>
         <div className="grid grid-cols-[0fr_1fr] gap-10">
-          <div></div>
-          {products && <ProductsGrid products={products} />}
+          <ProductsFilter setFilter={setFilter} />
+          {products && <ProductsGrid products={filteredProducts} />}
         </div>
       </div>
     </Layout>

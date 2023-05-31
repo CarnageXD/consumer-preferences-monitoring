@@ -86,7 +86,7 @@ export const CreateQuestion = ({
         <Textarea
           readOnly
           placeholder="Текстова відповідь"
-          className="hover:border-gray-300 focus:border-gray-300 active:border-gray-300"
+          className="hover:!border-gray-300 focus:!border-gray-300 active:!border-gray-300"
         />
       )}
       {(question.type === "radio" || question.type === "checkbox") &&

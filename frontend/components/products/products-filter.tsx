@@ -13,10 +13,6 @@ export const ProductsFilter = ({ setFilter }: ProductFilterProps) => {
     { title: "Сири тверді фасовані", value: "packaged" },
   ];
 
-  const handleSetFilter = (value: string) => {
-    setFilter(value);
-  };
-
   return (
     <div className="bg-primary-blue lg:mt-8 rounded-xl py-2 px-4 flex flex-col items-start gap-2">
       <Typography
@@ -25,13 +21,13 @@ export const ProductsFilter = ({ setFilter }: ProductFilterProps) => {
       >
         Фільтрація
       </Typography>
-      {filters.map((filter) => (
+      {filters.map(({ title, value }) => (
         <Typography
-          key={filter.title}
-          onClick={() => handleSetFilter(filter.value)}
+          key={title}
+          onClick={() => setFilter(value)}
           className="cursor-pointer transition-all text-center py-3 text-white w-full hover:bg-blue-900/50 font-medium hover:text-primary-yellow rounded-xl"
         >
-          {filter.title}
+          {title}
         </Typography>
       ))}
     </div>

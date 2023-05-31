@@ -22,8 +22,6 @@ import { toast } from "react-hot-toast";
 
 export default function ProductPage({ product }: { product: Product }) {
   const { user, isAuthenticated } = useAuth();
-  const userId = user?.id;
-  const userName = user?.firstName;
   const [avgRate, setAvgRate] = useState(0);
   const [userRate, setUserRate] = useState<number | null>(null);
   const [reviewText, setReviewText] = useState("");
@@ -31,7 +29,19 @@ export default function ProductPage({ product }: { product: Product }) {
   const [recommendProduct, setRecommendProduct] = useState<null | boolean>(
     null
   );
-  const [localReviews, setLocalReviews] = useState<any>(product.review);
+  const [localReviews, setLocalReviews] = useState<any>(product.review || []);
+
+  const userId = user?.id;
+  const userName = user?.firstName;
+  const cheeseType = product.type;
+  const cheeseTypeText =
+    cheeseType === "processed"
+      ? "Плавлені сири"
+      : cheeseType === "weighted"
+      ? "Сири тверді вагові"
+      : cheeseType === "packaged"
+      ? "Сири тверді фасовані"
+      : "";
 
   const { push } = useRouter();
 
@@ -148,7 +158,7 @@ export default function ProductPage({ product }: { product: Product }) {
     if (userRating) {
       setUserRate(userRating.rating);
     }
-  }, []);
+  }, [user, product]);
 
   if (!product) {
     return null;
@@ -172,7 +182,7 @@ export default function ProductPage({ product }: { product: Product }) {
             </Typography>
             <Typography className="text-gray-900 font-medium text-sm uppercase">
               {/*TODO: add enum*/}
-              сири тверді фасовані
+              {cheeseTypeText}
             </Typography>
           </div>
           <Typography className="text-lg">{product.description}</Typography>
@@ -269,7 +279,7 @@ export default function ProductPage({ product }: { product: Product }) {
               </Button>
             </div>
           </div>
-          {!!product.review.length && (
+          {!!localReviews.length && (
             <div>
               <Typography className="text-xl mb-2 font-medium">
                 Відгуки про товар:
