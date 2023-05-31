@@ -1,5 +1,4 @@
 import { Button, Typography } from "@material-tailwind/react";
-import { ProductWithAvgRatingAndCount } from "@pages/analytics/ratings";
 import {
   createColumnHelper,
   flexRender,
@@ -8,16 +7,13 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
+import { Rating } from "@types";
 import { useRouter } from "next/router";
 
 import React from "react";
 import { useDownloadExcel } from "react-export-table-to-excel";
 
-function AvgProductRatingTable({
-  products,
-}: {
-  products: ProductWithAvgRatingAndCount[];
-}) {
+export function LatestRatingTable({ ratings }: { ratings: Rating[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const tableRef = React.useRef(null);
 
@@ -28,27 +24,39 @@ function AvgProductRatingTable({
     sheet: "rating",
   });
 
-  const columnHelper = createColumnHelper<ProductWithAvgRatingAndCount>();
+  const columnHelper = createColumnHelper<Rating>();
 
   const columns = React.useMemo(() => {
     return [
-      columnHelper.accessor("name", {
+      columnHelper.accessor("product.name", {
         header: "Назва продукту",
         cell: (item) => item.getValue(),
       }),
-      columnHelper.accessor("averageRating", {
+      columnHelper.accessor("rating", {
         header: "Середня оцінка",
         cell: (item) => item.getValue().toFixed(2).replace(".", ","),
       }),
-      columnHelper.accessor("ratingCount", {
-        header: "Кількість оцінок",
-        cell: (item) => item.getValue(),
+      columnHelper.accessor("product.type", {
+        header: "Тип сиру",
+        cell: (item) => {
+          const cheeseType = item.getValue();
+          const cheeseTypeText =
+            cheeseType === "processed"
+              ? "Плавлені сири"
+              : cheeseType === "weighted"
+              ? "Сири тверді вагові"
+              : cheeseType === "packaged"
+              ? "Сири тверді фасовані"
+              : "";
+
+          return cheeseTypeText;
+        },
       }),
     ];
   }, [columnHelper]);
 
   const table = useReactTable({
-    data: products,
+    data: ratings,
     columns,
     state: {
       sorting,
@@ -102,7 +110,7 @@ function AvgProductRatingTable({
             return (
               <tr
                 key={row.id}
-                onClick={() => push(`/product/${row.original.tag}`)}
+                onClick={() => push(`/product/${row.original.product.tag}`)}
                 className="hover:bg-primary-blue hover:text-white cursor-pointer"
               >
                 {row.getVisibleCells().map((cell) => {
@@ -130,5 +138,3 @@ function AvgProductRatingTable({
     </div>
   );
 }
-
-export default AvgProductRatingTable;

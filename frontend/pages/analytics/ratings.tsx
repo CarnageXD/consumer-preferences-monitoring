@@ -1,4 +1,7 @@
-import { AvgProductRatingChart } from "@components/analytics";
+import {
+  AvgProductRatingChart,
+  LatestRatingTable,
+} from "@components/analytics";
 import AvgProductRatingTable from "@components/analytics/avg-product-rating-table";
 import { AccordionArrow, Layout, PageHeader } from "@components/common";
 import {
@@ -7,7 +10,7 @@ import {
   AccordionHeader,
   Typography,
 } from "@material-tailwind/react";
-import { Product } from "@types";
+import { Product, Rating } from "@types";
 import { getApiUrl } from "@utils";
 import { useState } from "react";
 
@@ -18,8 +21,10 @@ export interface ProductWithAvgRatingAndCount extends Product {
 
 export default function AnalyticsRatings({
   products,
+  ratings,
 }: {
   products: ProductWithAvgRatingAndCount[];
+  ratings: Rating[];
 }) {
   const [avgAccordionOpen, setAvgAccordionOpen] = useState(false);
   const [latestAccordionOpen, setLatestAccordionOpen] = useState(false);
@@ -60,8 +65,8 @@ export default function AnalyticsRatings({
               </Typography>
             </AccordionHeader>
             <AccordionBody>
-              <div className="grid grid-cols-[1fr_0.6fr] gap-10 items-center">
-                Таблиця з останніми даними
+              <div className="grid grid-cols-1 gap-10 items-center">
+                <LatestRatingTable ratings={ratings} />
               </div>
             </AccordionBody>
           </Accordion>
@@ -73,14 +78,19 @@ export default function AnalyticsRatings({
 
 export const getServerSideProps = async () => {
   try {
-    const url = getApiUrl("products/avgandcount");
+    const avgUrl = getApiUrl("products/avgandcount");
 
-    const res = await fetch(url);
-    const products = await res.json();
+    const latestUrl = getApiUrl("rating");
 
-    return { props: { products } };
+    const avgRes = await fetch(avgUrl);
+    const latestRes = await fetch(latestUrl);
+
+    const products = await avgRes.json();
+    const ratings = await latestRes.json();
+
+    return { props: { products, ratings } };
   } catch (error) {
     console.error(error);
-    return { props: { products: null } };
+    return { props: { products: null, ratings: null } };
   }
 };
