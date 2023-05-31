@@ -45,12 +45,10 @@ export default function ProductPage({ product }: { product: Product }) {
 
   const { push } = useRouter();
 
-  const { data: reviews, trigger: addReview } = useSWRMutation(
+  const { trigger: addReview } = useSWRMutation(
     getApiUrl("review"),
     mutationFetcher("POST")
   );
-
-  console.log("reviews", reviews);
 
   const { data: latestRating, trigger: addRate } = useSWRMutation(
     getApiUrl("rating"),
@@ -78,6 +76,7 @@ export default function ProductPage({ product }: { product: Product }) {
   ];
 
   const handleAddRate = async (value: string) => {
+    console.log("value");
     if (!isAuthenticated) {
       push("/login");
       return;
@@ -322,8 +321,6 @@ export const getServerSideProps = async ({
   try {
     const tag = query.slug[0];
     const url = getApiUrl(`products/${tag}`);
-
-    console.log("url", url);
 
     const res = await fetch(url);
     const product = await res.json();

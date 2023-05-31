@@ -9,7 +9,6 @@ import { useMemo, useState } from "react";
 
 export default function Products({ products }: { products: Product[] }) {
   const [filter, setFilter] = useState("all");
-  console.log("filter", filter);
 
   const filteredProducts = useMemo(() => {
     if (filter === "all") return products;
