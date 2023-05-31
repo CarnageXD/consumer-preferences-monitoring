@@ -30,7 +30,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = () => {
-    console.log(user);
     Cookies.remove("user-" + user?.id);
     setIsAuthenticated(false);
     setUser(null);
@@ -54,7 +53,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       fetch(getApiUrl(`users/${user.id}`))
         .then((response) => response.json())
         .then((data) => {
-          console.log("data", data);
           setUser(data);
         })
         .catch((error) => {});

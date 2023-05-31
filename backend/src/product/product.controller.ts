@@ -13,6 +13,11 @@ export class ProductController {
     return this.productService.create(createProductDto);
   }
 
+  @Get('avgandcount')
+  findAllWithAvgRatingsAndCount() {
+    return this.productService.findAllWithRatings();
+  }
+
   @Get()
   findAll() {
     return this.productService.findAll();

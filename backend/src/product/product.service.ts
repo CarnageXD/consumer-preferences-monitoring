@@ -37,4 +37,21 @@ export class ProductService {
   remove(id: number) {
     return `This action removes a #${id} product`;
   }
+
+  async findAllWithRatings() {
+    const products = await this.repository
+      .createQueryBuilder('product')
+      .select('product.id', 'id')
+      .addSelect('product.*')
+      .addSelect('AVG(CAST(rating.rating AS FLOAT))', 'averageRating')
+      .addSelect('COUNT(rating.id)', 'ratingCount')
+      .leftJoin('product.rating', 'rating')
+      .groupBy('product.id')
+      .getRawMany();
+
+    return products.map((product) => ({
+      ...product,
+      ratingCount: Number(product.ratingCount),
+    }));
+  }
 }
