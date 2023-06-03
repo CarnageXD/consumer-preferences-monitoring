@@ -15,15 +15,16 @@ import { TrashIcon } from "@heroicons/react/20/solid";
 import mutationFetcher from "@utils/mutation-fetcher";
 import useSWRMutation from "swr/mutation";
 import { useState } from "react";
-import { ReviewRemoveDialog } from "@components/analytics";
+import { ReviewRemoveDialog } from "@components/analytics/reviews";
 
 export default function AnalyticsReviews({ reviews }: { reviews: Review[] }) {
+  console.log(reviews);
   const [localReviews, setLocalReviews] = useState(reviews || []);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [showRemoveDialog, setRemovalDialog] = useState(false);
 
   const data = [
-    { label: "Всі", value: "all", localReviews },
+    { label: "Всі", value: "all", reviews: localReviews },
     {
       label: "Позитивні",
       value: "positive",
@@ -32,7 +33,7 @@ export default function AnalyticsReviews({ reviews }: { reviews: Review[] }) {
     {
       label: "Негативні",
       value: "negative",
-      reviews: localReviews.filter((reviews) => !reviews.recommended),
+      reviews: localReviews.filter((review) => !review.recommended),
     },
   ];
 
@@ -72,7 +73,7 @@ export default function AnalyticsReviews({ reviews }: { reviews: Review[] }) {
           {data.map(({ value, reviews }) => (
             <TabPanel key={value} value={value}>
               <div>
-                {localReviews.map((review) => {
+                {reviews?.map((review) => {
                   return (
                     <div
                       key={review.id}

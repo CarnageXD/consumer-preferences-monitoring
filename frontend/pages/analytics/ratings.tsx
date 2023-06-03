@@ -1,8 +1,8 @@
 import {
   AvgProductRatingChart,
   LatestRatingTable,
-} from "@components/analytics";
-import AvgProductRatingTable from "@components/analytics/avg-product-rating-table";
+  AvgProductRatingTable,
+} from "@components/analytics/ratings";
 import { AccordionArrow, Layout, PageHeader } from "@components/common";
 import {
   Accordion,
@@ -26,8 +26,9 @@ export default function AnalyticsRatings({
   products: ProductWithAvgRatingAndCount[];
   ratings: Rating[];
 }) {
-  const [avgAccordionOpen, setAvgAccordionOpen] = useState(false);
-  const [latestAccordionOpen, setLatestAccordionOpen] = useState(false);
+  console.log({ products, ratings });
+  const [avgAccordionOpen, setAvgAccordionOpen] = useState(true);
+  const [latestAccordionOpen, setLatestAccordionOpen] = useState(true);
 
   const toggleAvgAccordionOpen = () => setAvgAccordionOpen(!avgAccordionOpen);
   const toggleLatestAccordionOpen = () =>

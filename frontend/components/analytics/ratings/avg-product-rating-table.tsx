@@ -13,7 +13,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { useDownloadExcel } from "react-export-table-to-excel";
 
-function AvgProductRatingTable({
+export function AvgProductRatingTable({
   products,
 }: {
   products: ProductWithAvgRatingAndCount[];

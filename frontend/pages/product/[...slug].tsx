@@ -1,8 +1,8 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useMemo, useState } from "react";
 import { Layout } from "@components/common";
-import { Product } from "@types";
+import { Product, Review } from "@types";
 import Image from "next/image";
-import { Button, Input, Typography } from "@material-tailwind/react";
+import { Button, Select, Typography } from "@material-tailwind/react";
 import { Textarea } from "@components/common";
 import { getApiUrl } from "@utils";
 import { Rating } from "react-simple-star-rating";
@@ -19,9 +19,14 @@ import {
 import { useAuth } from "@context/auth";
 import { useRouter } from "next/router";
 import { toast } from "react-hot-toast";
+import ProductRatingsChart from "@components/analytics/ratings/product-ratings-chart";
 
 export default function ProductPage({ product }: { product: Product }) {
   const { user, isAuthenticated } = useAuth();
+  const [reviewSelectorDate, setReviewSelectorDate] = useState<string>("all");
+  const [reviewType, setReviewType] = useState<"positive" | "negative" | null>(
+    null
+  );
   const [avgRate, setAvgRate] = useState(0);
   const [userRate, setUserRate] = useState<number | null>(null);
   const [reviewText, setReviewText] = useState("");
@@ -74,6 +79,51 @@ export default function ProductPage({ product }: { product: Product }) {
       value: product?.periodAndTermsOfStorage,
     },
   ];
+
+  const filtredReviews = useMemo(() => {
+    let result: Review[] = localReviews;
+
+    // Перевірка на тип відгуків
+    if (reviewType) {
+      result = result.filter((review) => {
+        if (reviewType === "positive") {
+          return review.recommended === true;
+        } else if (reviewType === "negative") {
+          return review.recommended === false;
+        }
+        return true;
+      });
+    }
+
+    // Перевірка на період дати
+    if (reviewSelectorDate !== "all") {
+      const today = new Date();
+
+      result = result.filter((review) => {
+        const reviewDate = new Date(review.createdAt);
+
+        if (reviewSelectorDate === "today") {
+          return (
+            reviewDate.getDate() === today.getDate() &&
+            reviewDate.getMonth() === today.getMonth() &&
+            reviewDate.getFullYear() === today.getFullYear()
+          );
+        } else if (reviewSelectorDate === "month") {
+          const oneMonthAgo = new Date();
+          oneMonthAgo.setMonth(today.getMonth() - 1);
+          return reviewDate >= oneMonthAgo;
+        } else if (reviewSelectorDate === "week") {
+          const oneWeekAgo = new Date();
+          oneWeekAgo.setDate(today.getDate() - 7);
+          return reviewDate >= oneWeekAgo;
+        }
+
+        return true;
+      });
+    }
+
+    return result;
+  }, [reviewSelectorDate, localReviews, reviewType]);
 
   const handleAddRate = async (value: string) => {
     console.log("value");
@@ -228,6 +278,11 @@ export default function ProductPage({ product }: { product: Product }) {
               </Typography>
             </div>
           </div>
+          {user?.role === "ANALYST" && (
+            <div>
+              <ProductRatingsChart product={product} />
+            </div>
+          )}
           <div>
             <Typography className="text-xl mb-2 font-medium">
               Залишити свій відгук про товар:
@@ -283,7 +338,31 @@ export default function ProductPage({ product }: { product: Product }) {
               <Typography className="text-xl mb-2 font-medium">
                 Відгуки про товар:
               </Typography>
-              {localReviews
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex gap-2 items-center">
+                  <Button onClick={() => setReviewType(null)}>Усі</Button>
+                  <Button
+                    onClick={() => setReviewType("positive")}
+                    color="green"
+                  >
+                    Позитивні
+                  </Button>
+                  <Button onClick={() => setReviewType("negative")} color="red">
+                    Негативні
+                  </Button>
+                </div>
+                <select
+                  value={reviewSelectorDate}
+                  onChange={(e) => setReviewSelectorDate(e.target.value)}
+                  className="border-2 rounded-xl p-1 outline-none border-primary-blue"
+                >
+                  <option value="all">За весь час</option>
+                  <option value="today">За сьогодні</option>
+                  <option value="week">За тиждень</option>
+                  <option value="month">За останній місяць</option>
+                </select>
+              </div>
+              {filtredReviews
                 //@ts-ignore
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                 .map((rev: any) => (
@@ -305,6 +384,9 @@ export default function ProductPage({ product }: { product: Product }) {
                     <Typography>{rev.content}</Typography>
                   </div>
                 ))}
+              {!filtredReviews.length && (
+                <Typography>Відгуків не знайдено</Typography>
+              )}
             </div>
           )}
         </div>

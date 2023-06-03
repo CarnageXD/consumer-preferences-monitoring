@@ -2,6 +2,7 @@ import { User } from "./user";
 
 export interface Product {
   id: number;
+  createdAt: Date;
   name: string;
   tag: string;
   description: string;
@@ -18,6 +19,7 @@ export interface Product {
 
 export interface Rating {
   id: number;
+  createdAt: Date;
   rating: number;
   user: User;
   product: Product;
@@ -25,6 +27,7 @@ export interface Rating {
 
 export interface Review {
   id: number;
+  createdAt: Date;
   name: string;
   content: string;
   recommended: boolean;

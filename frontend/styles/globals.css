@@ -41,3 +41,14 @@ button[role="combobox"] span.absolute {
 svg.star-svg {
   display: inline;
 }
+
+.custom-tooltip {
+  background: #f4f4f4;
+  border: 1px solid #d4d4d4;
+  padding: 10px;
+  color: black;
+}
+
+.custom-tooltip .label {
+  font-weight: bold;
+}

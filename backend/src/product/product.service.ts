@@ -39,7 +39,13 @@ export class ProductService {
   }
 
   async findAllWithRatings() {
-    const products = await this.repository
+    const productsWithRatings = await this.repository
+      .createQueryBuilder('product')
+      .select('product')
+      .leftJoinAndSelect('product.rating', 'rating')
+      .getMany();
+
+    const productsWithAvgRatings = await this.repository
       .createQueryBuilder('product')
       .select('product.id', 'id')
       .addSelect('product.*')
@@ -49,9 +55,18 @@ export class ProductService {
       .groupBy('product.id')
       .getRawMany();
 
-    return products.map((product) => ({
-      ...product,
-      ratingCount: Number(product.ratingCount),
-    }));
+    // Соединяем данные
+    const products = productsWithAvgRatings.map((product) => {
+      const productWithRatings = productsWithRatings.find(
+        (p) => p.id === product.id,
+      );
+      return {
+        ...product,
+        rating: productWithRatings ? productWithRatings.rating : [],
+        ratingCount: Number(product.ratingCount),
+      };
+    });
+
+    return products;
   }
 }
