@@ -15,10 +15,12 @@ import { TrashIcon } from "@heroicons/react/20/solid";
 import mutationFetcher from "@utils/mutation-fetcher";
 import useSWRMutation from "swr/mutation";
 import { useState } from "react";
-import { ReviewRemoveDialog } from "@components/analytics/reviews";
+import {
+  ExportExcelButton,
+  ReviewRemoveDialog,
+} from "@components/analytics/reviews";
 
 export default function AnalyticsReviews({ reviews }: { reviews: Review[] }) {
-  console.log(reviews);
   const [localReviews, setLocalReviews] = useState(reviews || []);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [showRemoveDialog, setRemovalDialog] = useState(false);
@@ -73,6 +75,10 @@ export default function AnalyticsReviews({ reviews }: { reviews: Review[] }) {
           {data.map(({ value, reviews }) => (
             <TabPanel key={value} value={value}>
               <div>
+                <div className="flex justify-end">
+                  <ExportExcelButton reviews={reviews} />
+                </div>
+                <div className="mt-2" />
                 {reviews?.map((review) => {
                   return (
                     <div
