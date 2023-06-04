@@ -19,6 +19,7 @@ import {
   ExportExcelButton,
   ReviewRemoveDialog,
 } from "@components/analytics/reviews";
+import { useProtectedRoute } from "@hooks";
 
 export default function AnalyticsReviews({ reviews }: { reviews: Review[] }) {
   const [localReviews, setLocalReviews] = useState(reviews || []);
@@ -56,6 +57,13 @@ export default function AnalyticsReviews({ reviews }: { reviews: Review[] }) {
 
     handleShowRemoveDialog();
   };
+
+  const forbiddenRoute = useProtectedRoute();
+
+  if (forbiddenRoute) {
+    return null;
+  }
+
   return (
     <Layout className="pb-24">
       <ReviewRemoveDialog

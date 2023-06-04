@@ -31,7 +31,7 @@ export const SurveyAccordion = ({ survey }: { survey: Survey }) => {
                 <Typography className="text-black font-medium text-xl italic mb-2">
                   {question.question}
                 </Typography>
-                <div className="flex gap-10 items-center">
+                <div className="flex items-center">
                   <div className="flex flex-col gap-4">
                     {question.options.map((option) => {
                       return (

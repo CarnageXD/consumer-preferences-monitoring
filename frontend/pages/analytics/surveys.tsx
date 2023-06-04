@@ -1,10 +1,16 @@
 import { SurveyAccordion } from "@components/analytics/surveys";
 import { Layout, PageHeader } from "@components/common";
+import { useProtectedRoute } from "@hooks";
 import { Survey } from "@types";
 import { getApiUrl } from "@utils";
 
 export default function AnalyticsSurveys({ surveys }: { surveys: Survey[] }) {
-  console.log("surveys", surveys);
+  const forbiddenRoute = useProtectedRoute();
+
+  if (forbiddenRoute) {
+    return null;
+  }
+
   return (
     <Layout className="pb-24">
       <PageHeader text="Опитування" />

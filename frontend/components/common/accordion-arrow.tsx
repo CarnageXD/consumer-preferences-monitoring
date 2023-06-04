@@ -1,5 +1,4 @@
 export const AccordionArrow = ({ open }: { open: boolean }) => {
-  console.log("open", open);
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

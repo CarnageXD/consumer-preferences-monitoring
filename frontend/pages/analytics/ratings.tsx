@@ -4,6 +4,7 @@ import {
   AvgProductRatingTable,
 } from "@components/analytics/ratings";
 import { AccordionArrow, Layout, PageHeader } from "@components/common";
+import { useProtectedRoute } from "@hooks";
 import {
   Accordion,
   AccordionBody,
@@ -26,13 +27,18 @@ export default function AnalyticsRatings({
   products: ProductWithAvgRatingAndCount[];
   ratings: Rating[];
 }) {
-  console.log({ products, ratings });
   const [avgAccordionOpen, setAvgAccordionOpen] = useState(true);
   const [latestAccordionOpen, setLatestAccordionOpen] = useState(true);
 
   const toggleAvgAccordionOpen = () => setAvgAccordionOpen(!avgAccordionOpen);
   const toggleLatestAccordionOpen = () =>
     setLatestAccordionOpen(!latestAccordionOpen);
+
+  const forbiddenRoute = useProtectedRoute();
+
+  if (forbiddenRoute) {
+    return null;
+  }
 
   return (
     <Layout className="pb-24">

@@ -1,10 +1,17 @@
 import { Layout, PageHeader, PreviewImage } from "@components/common";
+import { useProtectedRoute } from "@hooks";
 
 import RatingsPreviewImage from "@public/rating-analytics.jpeg";
 import ReviewPreviewImage from "@public/review-analytics.png";
 import SurveyPreviewImage from "@public/survey-analytics.png";
 
 export default function Analytics() {
+  const forbiddenRoute = useProtectedRoute();
+
+  if (forbiddenRoute) {
+    return null;
+  }
+
   return (
     <Layout className="pb-24">
       <PageHeader text="Аналітика" />
