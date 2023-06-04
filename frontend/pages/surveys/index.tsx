@@ -45,7 +45,7 @@ export default function Surveys({ surveys }: { surveys: Survey[] }) {
         showRemoveDialog={showRemoveDialog}
         handleShowRemoveDialog={handleShowRemoveDialog}
       />
-      <PageHeader text="Актуальні опитування" />
+      <PageHeader text="Перелік опитувань" />
       <div className="grid grid-cols-3 w-full gap-10">
         {isAnalyst && (
           <Link

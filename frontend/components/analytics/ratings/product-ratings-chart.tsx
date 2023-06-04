@@ -30,8 +30,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 const ProductRatingsChart = ({ product }: { product: Product }) => {
   const [isCalendarSet, setIsCalendarSet] = useState(false);
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   const chartData = useMemo(() => {
     if (!isCalendarSet) {
@@ -46,7 +46,9 @@ const ProductRatingsChart = ({ product }: { product: Product }) => {
     return product.rating
       .filter(
         (rate) =>
+          //@ts-ignore
           new Date(rate.createdAt) >= startDate &&
+          //@ts-ignore
           new Date(rate.createdAt) <= endDate
       )
       .sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
