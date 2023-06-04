@@ -27,6 +27,11 @@ export class SurveyController {
     return this.surveyService.findAll();
   }
 
+  @Get('extended')
+  findAllExtended() {
+    return this.surveyService.findAllExtended();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.surveyService.findOne(+id);

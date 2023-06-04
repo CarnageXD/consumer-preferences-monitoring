@@ -35,6 +35,51 @@ export class SurveyService {
     });
   }
 
+  async findAllExtended() {
+    const surveys = await this.surveyRepository.find({
+      relations: ['questions', 'responses', 'responses.question'],
+    });
+
+    for (const survey of surveys) {
+      for (const question of survey.questions) {
+        const questionResponses = survey.responses.filter(
+          (response) => response.question.id === question.id,
+        );
+
+        if (question.type === 'text') {
+          // Create an entry for text answers and store all responses in an array
+          question['textAnswers'] = questionResponses.map(
+            (response) => response.answers[0],
+          );
+        } else {
+          const totalResponses = questionResponses.length;
+          const answerCounts = {};
+
+          for (const response of questionResponses) {
+            for (const answer of response.answers) {
+              if (!answerCounts[answer]) {
+                answerCounts[answer] = 0;
+              }
+              answerCounts[answer]++;
+            }
+          }
+
+          question['answerPercentages'] = {};
+          for (const [answer, count] of Object.entries(answerCounts)) {
+            if (!isNaN(+count) && totalResponses > 0) {
+              question['answerPercentages'][answer] =
+                (Number(count) / totalResponses) * 100;
+            } else {
+              question['answerPercentages'][answer] = 0;
+            }
+          }
+        }
+      }
+    }
+
+    return surveys;
+  }
+
   async findOne(id: number): Promise<SurveyEntity> {
     return await this.surveyRepository.findOne({
       where: { id },

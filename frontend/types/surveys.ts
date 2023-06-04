@@ -11,6 +11,8 @@ export interface SurveyQuestion {
   question: string;
   type: "text" | "radio" | "checkbox";
   options: string[];
+  answerPercentages: { [key: string]: string };
+  textAnswers: string[];
   survey?: Survey;
   surveyResponses?: SurveyResponse[];
 }
