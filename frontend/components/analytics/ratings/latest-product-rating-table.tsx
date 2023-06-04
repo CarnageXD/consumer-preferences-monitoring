@@ -33,7 +33,7 @@ export function LatestRatingTable({ ratings }: { ratings: Rating[] }) {
         cell: (item) => item.getValue(),
       }),
       columnHelper.accessor("rating", {
-        header: "Середня оцінка",
+        header: "Оцінка",
         cell: (item) => item.getValue().toFixed(2).replace(".", ","),
       }),
       columnHelper.accessor("product.type", {
@@ -69,6 +69,11 @@ export function LatestRatingTable({ ratings }: { ratings: Rating[] }) {
 
   return (
     <div>
+      <div className="flex justify-end">
+        <Button onClick={onDownload} className="mb-4">
+          Завантажити Excel
+        </Button>
+      </div>
       <table ref={tableRef} width="100%">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -130,11 +135,6 @@ export function LatestRatingTable({ ratings }: { ratings: Rating[] }) {
           })}
         </tbody>
       </table>
-      <div className="flex justify-end">
-        <Button onClick={onDownload} className="mt-4">
-          Завантажити Excel
-        </Button>
-      </div>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { Layout, PageHeader, PreviewImage } from "@components/common";
 import { useProtectedRoute } from "@hooks";
+import { Typography } from "@material-tailwind/react";
 
 import RatingsPreviewImage from "@public/rating-analytics.jpeg";
 import ReviewPreviewImage from "@public/review-analytics.png";
@@ -9,7 +10,11 @@ export default function Analytics() {
   const forbiddenRoute = useProtectedRoute();
 
   if (forbiddenRoute) {
-    return null;
+    return (
+      <Typography className="mt-48 font-medium text-center text-2xl">
+        У Вас нема права доступу до цих даних.
+      </Typography>
+    );
   }
 
   return (

@@ -61,6 +61,11 @@ export function AvgProductRatingTable({
 
   return (
     <div>
+      <div className="flex justify-end">
+        <Button onClick={onDownload} className="mb-4">
+          Завантажити Excel
+        </Button>
+      </div>
       <table ref={tableRef} width="100%">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -122,11 +127,6 @@ export function AvgProductRatingTable({
           })}
         </tbody>
       </table>
-      <div className="flex justify-end">
-        <Button onClick={onDownload} className="mt-4">
-          Завантажити Excel
-        </Button>
-      </div>
     </div>
   );
 }

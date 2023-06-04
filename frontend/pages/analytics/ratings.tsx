@@ -37,9 +37,12 @@ export default function AnalyticsRatings({
   const forbiddenRoute = useProtectedRoute();
 
   if (forbiddenRoute) {
-    return null;
+    return (
+      <Typography className="mt-48 font-medium text-center text-2xl">
+        У Вас нема права доступу до цих даних.
+      </Typography>
+    );
   }
-
   return (
     <Layout className="pb-24">
       <PageHeader text="Рейтинги продуктів" />

@@ -32,6 +32,9 @@ export const SurveyOptionAccordion = ({
               {index + 1}. {answer}
             </Typography>
           ))}
+          {!question.textAnswers.length && (
+            <Typography>Відповіді відсутні</Typography>
+          )}
         </div>
       </AccordionBody>
     </Accordion>

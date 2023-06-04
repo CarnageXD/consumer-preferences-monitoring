@@ -1,6 +1,7 @@
 import { SurveyAccordion } from "@components/analytics/surveys";
 import { Layout, PageHeader } from "@components/common";
 import { useProtectedRoute } from "@hooks";
+import { Typography } from "@material-tailwind/react";
 import { Survey } from "@types";
 import { getApiUrl } from "@utils";
 
@@ -8,7 +9,11 @@ export default function AnalyticsSurveys({ surveys }: { surveys: Survey[] }) {
   const forbiddenRoute = useProtectedRoute();
 
   if (forbiddenRoute) {
-    return null;
+    return (
+      <Typography className="mt-48 font-medium text-center text-2xl">
+        У Вас нема права доступу до цих даних.
+      </Typography>
+    );
   }
 
   return (
