@@ -5,6 +5,7 @@ import { SurveyEntity } from './entities/survey.entity';
 import { CreateSurveyDto, CreateQuestionDto } from './dto/create-survey.dto';
 import { UpdateSurveyDto } from './dto/update-survey.dto';
 import { SurveyQuestionEntity } from '@survey-question/entities/survey-question.entity';
+import { SurveyResponseEntity } from '@survey-response/entities/survey-response.entity';
 
 @Injectable()
 export class SurveyService {
@@ -13,6 +14,8 @@ export class SurveyService {
     private readonly surveyRepository: Repository<SurveyEntity>,
     @InjectRepository(SurveyQuestionEntity)
     private readonly questionRepository: Repository<SurveyQuestionEntity>,
+    @InjectRepository(SurveyResponseEntity)
+    private readonly responseRepository: Repository<SurveyResponseEntity>,
   ) {}
 
   async create(createSurveyDto: CreateSurveyDto): Promise<SurveyEntity> {
@@ -98,13 +101,17 @@ export class SurveyService {
       throw new NotFoundException(`Survey with id ${id} not found`);
     }
 
+    // Remove associated responses
+    await this.responseRepository.delete({ survey: { id: survey.id } });
+
+    // Remove associated questions
+    await this.questionRepository.delete({ survey: { id: survey.id } });
+
+    // Update and save the survey
     survey.title = title;
     const updatedSurvey = await this.surveyRepository.save(survey);
 
-    // Remove existing questions for the survey
-    await this.questionRepository.delete({ survey: { id: updatedSurvey.id } });
-
-    // Create and associate new questions with the survey
+    // Associate new questions with the survey
     for (const questionDto of questions) {
       const question = this.createQuestion(questionDto);
       question.survey = updatedSurvey;
