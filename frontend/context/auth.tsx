@@ -25,11 +25,13 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = (jwt: string, user: any) => {
     Cookies.set("user-" + user.id, jwt, { expires: 1 / 24 });
+    //@ts-ignore
     setUser({ id: user?.id });
     setIsAuthenticated(true);
   };
 
   const logout = () => {
+    //@ts-ignore
     Cookies.remove("user-" + user?.id);
     setIsAuthenticated(false);
     setUser(null);
@@ -41,6 +43,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
     if (userIdCookie) {
       const userId = userIdCookie.replace("user-", "");
+      //@ts-ignore
       setUser({ id: userId });
       setIsAuthenticated(true);
     } else {
@@ -49,7 +52,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
+    //@ts-ignore
     if (user && user.id) {
+      //@ts-ignore
       fetch(getApiUrl(`users/${user.id}`))
         .then((response) => response.json())
         .then((data) => {
@@ -57,6 +62,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         })
         .catch((error) => {});
     }
+    //@ts-ignore
   }, [user?.id]);
 
   const contextValue = {
