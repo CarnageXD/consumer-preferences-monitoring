@@ -4,6 +4,7 @@ export interface Survey {
   id: number;
   title: string;
   questions: SurveyQuestion[];
+  responses: SurveyResponse[];
 }
 
 export interface SurveyQuestion {
@@ -23,4 +24,5 @@ export interface SurveyResponse {
   user: User;
   question: SurveyQuestion;
   answers: string[];
+  createdAt: string;
 }

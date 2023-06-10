@@ -49,7 +49,7 @@ export default function Surveys({ surveys }: { surveys: Survey[] }) {
       <div className="grid grid-cols-3 w-full gap-10">
         {isAnalyst && (
           <Link
-            href="/surveys/createOrEdit"
+            href="/surveys/create-or-edit"
             className="group border-2 border-primary-blue h-[250px] hover:bg-primary-blue rounded-xl flex justify-center items-center transition-all"
           >
             <PlusIcon className="text-primary-blue group-hover:text-white h-10 w-10 transition-all" />
@@ -90,7 +90,10 @@ export default function Surveys({ surveys }: { surveys: Survey[] }) {
                     color="yellow"
                     variant="outlined"
                     onClick={() =>
-                      push({ query: { id }, pathname: "surveys/createOrEdit" })
+                      push({
+                        query: { id },
+                        pathname: "surveys/create-or-edit",
+                      })
                     }
                   >
                     Редагувати

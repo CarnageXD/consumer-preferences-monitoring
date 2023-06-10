@@ -83,7 +83,6 @@ export default function ProductPage({ product }: { product: Product }) {
   const filtredReviews = useMemo(() => {
     let result: Review[] = localReviews;
 
-    // Перевірка на тип відгуків
     if (reviewType) {
       result = result.filter((review) => {
         if (reviewType === "positive") {
@@ -95,7 +94,6 @@ export default function ProductPage({ product }: { product: Product }) {
       });
     }
 
-    // Перевірка на період дати
     if (reviewSelectorDate !== "all") {
       const today = new Date();
 

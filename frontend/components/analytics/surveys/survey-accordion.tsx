@@ -9,6 +9,7 @@ import { Survey } from "@types";
 import { useState } from "react";
 import { SurveyOptionAccordion } from "./survey-text-option-accordion";
 import { SurveyResponseChart } from "./survey-response-chart";
+import { ExportSurveyExcelButton } from "./export-survey-excel-button";
 
 export const SurveyAccordion = ({ survey }: { survey: Survey }) => {
   const [open, setOpen] = useState(false);
@@ -25,6 +26,9 @@ export const SurveyAccordion = ({ survey }: { survey: Survey }) => {
       </AccordionHeader>
       <AccordionBody className="px-2">
         <div className="flex flex-col gap-4">
+          <div className="flex justify-end">
+            <ExportSurveyExcelButton surveyAnswers={survey.responses} />
+          </div>
           {survey.questions.map((question) => {
             return (
               <div

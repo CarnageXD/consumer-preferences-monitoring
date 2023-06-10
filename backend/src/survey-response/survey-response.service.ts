@@ -47,16 +47,39 @@ export class SurveyResponseService {
         );
       }
 
-      const newSurveyResponse = this.surveyResponseRepository.create({
-        survey,
-        user,
-        question,
-        answers: responseItem.answers,
-      });
+      // Check if this user has already answered this question in this survey
+      const existingSurveyResponse =
+        await this.surveyResponseRepository.findOne({
+          where: {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            //@ts-ignore
+            'survey.id': survey.id,
+            'user.id': user.id,
+            'question.id': question.id,
+          },
+        });
 
-      surveyResponses.push(
-        await this.surveyResponseRepository.save(newSurveyResponse),
-      );
+      let surveyResponse;
+      if (existingSurveyResponse) {
+        // Update the existing response
+        existingSurveyResponse.answers = responseItem.answers;
+        surveyResponse = await this.surveyResponseRepository.save(
+          existingSurveyResponse,
+        );
+      } else {
+        // Create a new response
+        const newSurveyResponse = this.surveyResponseRepository.create({
+          survey,
+          user,
+          question,
+          answers: responseItem.answers,
+        });
+        surveyResponse = await this.surveyResponseRepository.save(
+          newSurveyResponse,
+        );
+      }
+
+      surveyResponses.push(surveyResponse);
     }
 
     return { response: surveyResponses };

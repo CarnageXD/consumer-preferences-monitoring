@@ -13,10 +13,10 @@ import { toast } from "react-hot-toast";
 
 export default function CreateOrUpdateSurvey({ survey }: { survey: Survey }) {
   const [title, setTitle] = useState(
-    survey.title || "Нове опитування (натисніть, щоб змінити назву)"
+    survey?.title || "Нове опитування (натисніть, щоб змінити назву)"
   );
   const [questions, setQuestions] = useState<SurveyQuestion[]>(
-    survey.questions || []
+    survey?.questions || []
   );
 
   const [isBrowser, setIsBrowser] = useState(false);

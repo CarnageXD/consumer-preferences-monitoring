@@ -43,13 +43,22 @@ const ProductRatingsChart = ({ product }: { product: Product }) => {
         }));
     }
 
+    let actualEndDate = endDate;
+
+    if (endDate) {
+      //@ts-ignore
+      actualEndDate = new Date(endDate.getTime());
+      //@ts-ignore
+      actualEndDate.setDate(endDate.getDate() + 1);
+    }
+
     return product.rating
       .filter(
         (rate) =>
           //@ts-ignore
           new Date(rate.createdAt) >= startDate &&
           //@ts-ignore
-          new Date(rate.createdAt) <= endDate
+          new Date(rate.createdAt) <= actualEndDate
       )
       .sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
       .map((r) => ({

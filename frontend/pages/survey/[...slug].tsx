@@ -125,12 +125,15 @@ export default function Survey({ survey }: { survey: Survey }) {
               <div className="flex gap-8">
                 {type === "radio" &&
                   options.map((variant, variantIndex) => (
-                    <Radio
-                      key={variantIndex}
-                      name={`question-${id}`}
-                      label={variant}
-                      onChange={() => handleInputChange(id, variant)}
-                    />
+                    <label htmlFor={variant + variantIndex}>
+                      <Radio
+                        id={variant + variantIndex}
+                        key={variant + variantIndex}
+                        name={`question-${id}`}
+                        label={variant}
+                        onChange={() => handleInputChange(id, variant)}
+                      />
+                    </label>
                   ))}
                 {type === "text" && (
                   <Textarea
@@ -139,13 +142,23 @@ export default function Survey({ survey }: { survey: Survey }) {
                 )}
                 {type === "checkbox" &&
                   options.map((variant, variantIndex) => (
-                    <Checkbox
-                      key={variantIndex}
-                      label={variant}
-                      onChange={(event) =>
-                        handleCheckboxChange(id, variant, event.target.checked)
-                      }
-                    />
+                    <label
+                      className="flex items-center cursor-pointer"
+                      htmlFor={variant + variantIndex}
+                    >
+                      <Checkbox
+                        id={variant + variantIndex}
+                        key={variant + variantIndex}
+                        onChange={(event) =>
+                          handleCheckboxChange(
+                            id,
+                            variant,
+                            event.target.checked
+                          )
+                        }
+                      />
+                      <Typography>{variant}</Typography>
+                    </label>
                   ))}
               </div>
             </div>

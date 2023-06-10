@@ -6,6 +6,7 @@ import { Survey } from "@types";
 import { getApiUrl } from "@utils";
 
 export default function AnalyticsSurveys({ surveys }: { surveys: Survey[] }) {
+  console.log("surveys", surveys);
   const forbiddenRoute = useProtectedRoute();
 
   if (forbiddenRoute) {

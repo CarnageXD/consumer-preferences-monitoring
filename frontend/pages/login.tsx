@@ -28,10 +28,12 @@ export default function Login() {
 
   const { push } = useRouter();
 
-  const { trigger: registerUser } = useSWRMutation(
+  const { trigger: registerUser, error } = useSWRMutation(
     getApiUrl("users"),
     mutationFetcher("POST")
   );
+
+  console.log("regerror", error);
 
   const { trigger: loginUser } = useSWRMutation(
     getApiUrl("users/login"),
@@ -42,6 +44,7 @@ export default function Login() {
     register,
     handleSubmit: onSubmit,
     formState: { errors },
+    setError,
     getValues,
   } = useForm();
 
@@ -64,10 +67,16 @@ export default function Login() {
     }
 
     const res = await registerUser(getValues());
+    console.log("res", res);
 
     if (res?.access_token) {
       toast.success("Реєстрація успішна.");
       login(res.access_token, res.user);
+    } else {
+      if (res.message.includes("already exists")) {
+        console.log("inside");
+        setError("email", { ...res, message: "Користувач вже існує" });
+      }
     }
   };
 

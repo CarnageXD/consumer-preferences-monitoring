@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity, UserRole } from './entities/user.entity';
@@ -22,7 +22,7 @@ export class UsersService {
     });
 
     if (user) {
-      throw new Error('User with this email already exists');
+      throw new BadRequestException('User with this email already exists');
     }
 
     const hashedPassword = await bcrypt.hash(newUser.password, 10);
